@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"net/url"
 	"os"
 	"strings"
 	"time"
@@ -14,13 +15,19 @@ import (
 )
 
 var LoginCmd = &cobra.Command{
-	Use:   "login",
+	Use:   "login [email]",
 	Short: "Login to MockThis",
+	Args:  cobra.MaximumNArgs(1),
 	Run:   login,
 }
 
 func login(cmd *cobra.Command, args []string) {
-	email := promptForInput("Enter your email: ")
+	var email string
+	if len(args) > 0 {
+		email = args[0]
+	} else {
+		email = promptForInput("Enter your email: ")
+	}
 
 	loginData := map[string]string{"email": email}
 	jsonData, _ := json.Marshal(loginData)
@@ -63,10 +70,12 @@ func pollForToken(email, hash string) string {
 	ticker := time.NewTicker(10 * time.Second)
 	defer ticker.Stop()
 
+	emailEncoded := url.QueryEscape(email)
+
 	for {
 		select {
 		case <-ticker.C:
-			url := fmt.Sprintf("%s/login/hash?email=%s&hash=%s", config.BaseURL, email, hash)
+			url := fmt.Sprintf("%s/login/hash?email=%s&hash=%s", config.BaseURL, emailEncoded, hash)
 			resp, err := client.Get(url)
 			if err != nil {
 				fmt.Println("Error checking login status:", err)
