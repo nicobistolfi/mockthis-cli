@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"net/http"
 	"os"
-	"path/filepath"
 	"strings"
 	"time"
 
@@ -109,19 +108,7 @@ func saveCredentials(email, token string) {
 		return
 	}
 
-	homeDir, err := os.UserHomeDir()
-	if err != nil {
-		fmt.Println("Error getting user home directory:", err)
-		return
-	}
-
-	credentialsPath := filepath.Join(homeDir, ".mockthis", "credentials")
-	if err := os.MkdirAll(filepath.Dir(credentialsPath), 0700); err != nil {
-		fmt.Println("Error creating .mockthis directory:", err)
-		return
-	}
-
-	if err := os.WriteFile(credentialsPath, jsonData, 0600); err != nil {
+	if err := config.SaveConfig(config.TokenFile, string(jsonData)); err != nil {
 		fmt.Println("Error saving credentials:", err)
 		return
 	}

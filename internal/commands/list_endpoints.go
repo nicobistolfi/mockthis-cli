@@ -16,11 +16,12 @@ var ListEndpointsCmd = &cobra.Command{
 }
 
 func listEndpoints(cmd *cobra.Command, args []string) {
-	token, err := config.LoadConfig(config.TokenFile)
+	configData, err := config.LoadConfig(config.TokenFile)
 	if err != nil {
 		fmt.Println("You need to login first.")
 		return
 	}
+	token := configData.Token
 
 	req, _ := http.NewRequest("GET", config.BaseURL+"/endpoints", nil)
 	req.Header.Set("Authorization", "Bearer "+token)

@@ -16,11 +16,12 @@ var DeleteEndpointCmd = &cobra.Command{
 }
 
 func deleteEndpoint(cmd *cobra.Command, args []string) {
-	token, err := config.LoadConfig(config.TokenFile)
+	configData, err := config.LoadConfig(config.TokenFile)
 	if err != nil {
 		fmt.Println("You need to login first.")
 		return
 	}
+	token := configData.Token
 
 	id := args[0]
 

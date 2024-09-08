@@ -17,11 +17,12 @@ var CreateEndpointCmd = &cobra.Command{
 }
 
 func createEndpoint(cmd *cobra.Command, args []string) {
-	token, err := config.LoadConfig(config.TokenFile)
+	configData, err := config.LoadConfig(config.TokenFile)
 	if err != nil {
 		fmt.Println("You need to login first.")
 		return
 	}
+	token := configData.Token
 
 	httpStatus := promptForInput("Enter HTTP status code: ")
 	responseContentType := promptForInput("Enter response Content-Type: ")

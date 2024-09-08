@@ -1,31 +1,42 @@
 package config
 
 import (
-	"io/ioutil"
+	"encoding/json"
 	"os"
 	"path/filepath"
 )
 
 const (
 	BaseURL   = "https://dev.api.mockthis.io/api/v1"
-	TokenFile = ".token"
-	EmailFile = ".email"
+	TokenFile = ".credentials"
 	ConfigDir = ".mockthis"
 )
+
+type ConfigData struct {
+	Token string `json:"token"`
+	Email string `json:"email"`
+}
 
 func SaveConfig(filename, data string) error {
 	configPath := filepath.Join(os.Getenv("HOME"), ConfigDir)
 	if err := os.MkdirAll(configPath, 0700); err != nil {
 		return err
 	}
-	return ioutil.WriteFile(filepath.Join(configPath, filename), []byte(data), 0600)
+	return os.WriteFile(filepath.Join(configPath, filename), []byte(data), 0600)
 }
 
-func LoadConfig(filename string) (string, error) {
+func LoadConfig(filename string) (*ConfigData, error) {
 	configPath := filepath.Join(os.Getenv("HOME"), ConfigDir, filename)
-	data, err := ioutil.ReadFile(configPath)
+	data, err := os.ReadFile(configPath)
 	if err != nil {
-		return "", err
+		return nil, err
 	}
-	return string(data), nil
+
+	var config ConfigData
+	err = json.Unmarshal(data, &config)
+	if err != nil {
+		return nil, err
+	}
+
+	return &config, nil
 }
