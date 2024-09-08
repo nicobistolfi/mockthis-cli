@@ -18,6 +18,7 @@ func init() {
 	rootCmd.AddCommand(commands.RegisterCmd)
 	rootCmd.AddCommand(commands.CreateEndpointCmd)
 	rootCmd.AddCommand(commands.ListEndpointsCmd)
+	rootCmd.AddCommand(commands.GetEndpointCmd)
 	rootCmd.AddCommand(commands.UpdateEndpointCmd)
 	rootCmd.AddCommand(commands.DeleteEndpointCmd)
 }

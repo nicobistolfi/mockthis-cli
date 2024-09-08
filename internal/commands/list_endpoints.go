@@ -1,11 +1,13 @@
 package commands
 
 import (
-	"bytes"
 	"encoding/json"
 	"fmt"
 	"io"
 	"net/http"
+	"os"
+	"text/tabwriter"
+	"time"
 
 	"github.com/nicobistolfi/mockthis-cli/internal/config"
 	"github.com/spf13/cobra"
@@ -41,19 +43,40 @@ func listEndpoints(cmd *cobra.Command, args []string) {
 		return
 	}
 
-	// Print the response body in a pretty format
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
 		fmt.Println("Error reading response body:", err)
 		return
 	}
 
-	var prettyJSON bytes.Buffer
-	err = json.Indent(&prettyJSON, body, "", "  ")
+	var endpoints []struct {
+		ID             string    `json:"id"`
+		HttpStatus     int       `json:"httpStatus"`
+		CreatedAt      time.Time `json:"createdAt"`
+		MockIdentifier string    `json:"mockIdentifier"`
+		EndpointURL    string    `json:"endpointUrl"`
+	}
+
+	err = json.Unmarshal(body, &endpoints)
 	if err != nil {
-		fmt.Println("Error pretty printing JSON:", err)
+		fmt.Println("Error parsing JSON:", err)
 		return
 	}
-	fmt.Println(prettyJSON.String())
 
+	w := tabwriter.NewWriter(os.Stdout, 0, 0, 2, ' ', 0)
+	fmt.Fprintln(w, "Mock Identifier\tID\tMethod\tStatus\tCreated At\tEndpoint URL")
+	fmt.Fprintln(w, "----------------\t--\t------\t------\t----------\t------------")
+
+	for _, e := range endpoints {
+		method := "GET" // Default method
+		fmt.Fprintf(w, "%s\t%s\t%s\t%d\t%s\t%s\n",
+			e.MockIdentifier,
+			e.ID,
+			method,
+			e.HttpStatus,
+			e.CreatedAt.Format("2006-01-02 15:04:05"),
+			e.EndpointURL)
+	}
+
+	w.Flush()
 }
