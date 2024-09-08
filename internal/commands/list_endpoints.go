@@ -1,8 +1,10 @@
 package commands
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
+	"io"
 	"net/http"
 
 	"github.com/nicobistolfi/mockthis-cli/internal/config"
@@ -39,11 +41,19 @@ func listEndpoints(cmd *cobra.Command, args []string) {
 		return
 	}
 
-	var endpoints []map[string]interface{}
-	json.NewDecoder(resp.Body).Decode(&endpoints)
-
-	fmt.Println("Your mock endpoints:")
-	for _, endpoint := range endpoints {
-		fmt.Printf("ID: %s, URL: %s\n", endpoint["mockIdentifier"], endpoint["mockUrl"])
+	// Print the response body in a pretty format
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		fmt.Println("Error reading response body:", err)
+		return
 	}
+
+	var prettyJSON bytes.Buffer
+	err = json.Indent(&prettyJSON, body, "", "  ")
+	if err != nil {
+		fmt.Println("Error pretty printing JSON:", err)
+		return
+	}
+	fmt.Println(prettyJSON.String())
+
 }
