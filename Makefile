@@ -2,7 +2,9 @@
 run:
 	go run cmd/mockthis/main.go
 
-.PHONY: build
+test:
+	go test ./...
+
 build:
 	go build -o mockthis-cli cmd/mockthis/main.go
 
