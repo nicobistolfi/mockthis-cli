@@ -36,12 +36,21 @@ func init() {
 }
 
 func createEndpoint(cmd *cobra.Command, args []string) {
-	configData, err := config.LoadConfig(config.TokenFile)
+	endpointData, err := parseCommandArguments(cmd)
 	if err != nil {
-		fmt.Println("You need to login first.")
-		return
+		fmt.Println("Error parsing command arguments:", err)
+		os.Exit(1)
 	}
-	token := configData.Token
+	response := queryAPIEndpoint(endpointData)
+	message, err := processAPIResponse(response)
+	if err != nil {
+		fmt.Println("Error processing API response:", err)
+		os.Exit(1)
+	}
+	fmt.Println(message)
+}
+
+func parseCommandArguments(cmd *cobra.Command) (map[string]interface{}, error) {
 
 	var endpointData map[string]interface{}
 
@@ -57,14 +66,6 @@ func createEndpoint(cmd *cobra.Command, args []string) {
 		endpointData["httpStatus"], _ = strconv.Atoi(httpStatus)
 	}
 
-	// Add default values for httpHeaders and mockIdentifier
-	if _, ok := endpointData["httpHeaders"]; !ok {
-		endpointData["httpHeaders"] = map[string]string{}
-	}
-	if _, ok := endpointData["mockIdentifier"]; !ok {
-		endpointData["mockIdentifier"] = "default-mock-endpoint"
-	}
-
 	authType, _ := cmd.Flags().GetString("auth-type")
 	authProperties, _ := cmd.Flags().GetString("auth-properties")
 
@@ -75,49 +76,67 @@ func createEndpoint(cmd *cobra.Command, args []string) {
 		os.Exit(1)
 	}
 
+	// Ensure correct types for specific fields
 	endpointData["method"] = endpointData["method"].(string)
 	endpointData["responseContentType"] = endpointData["responseContentType"].(string)
 	endpointData["charset"] = endpointData["charset"].(string)
 	endpointData["responseBody"] = endpointData["responseBody"].(string)
 
-	if _, ok := endpointData["responseBodySchema"]; ok {
-		endpointData["responseBodySchema"] = endpointData["responseBodySchema"].(string)
+	for _, field := range []string{"responseBodySchema", "requestContentType", "requestBodySchema"} {
+		if value, ok := endpointData[field]; ok {
+			endpointData[field] = value.(string)
+		}
 	}
 
-	if _, ok := endpointData["requestContentType"]; ok {
-		endpointData["requestContentType"] = endpointData["requestContentType"].(string)
-	}
+	return endpointData, nil
+}
 
-	if _, ok := endpointData["requestBodySchema"]; ok {
-		endpointData["requestBodySchema"] = endpointData["requestBodySchema"].(string)
+func getConfig() *config.ConfigData {
+	configData, err := config.LoadConfig(config.TokenFile)
+	if err != nil {
+		fmt.Println("You need to login first.")
+		os.Exit(1)
 	}
+	return configData
+}
+
+func queryAPIEndpoint(endpointData map[string]interface{}) *http.Response {
+	configData := getConfig()
 
 	jsonData, _ := json.Marshal(endpointData)
 
+	fmt.Println(string(jsonData))
+
 	req, _ := http.NewRequest("POST", config.BaseURL+"/endpoint", bytes.NewBuffer(jsonData))
 	req.Header.Set("Content-Type", "application/json")
-	req.Header.Set("Authorization", "Bearer "+token)
+	req.Header.Set("Authorization", "Bearer "+configData.Token)
 
 	client := &http.Client{}
 	resp, err := client.Do(req)
 	if err != nil {
 		fmt.Println("Error creating endpoint:", err)
-		return
+		os.Exit(1)
 	}
+
+	return resp
+}
+
+func processAPIResponse(resp *http.Response) (string, error) {
 	defer resp.Body.Close()
 
 	if resp.StatusCode != http.StatusOK {
-		fmt.Println("Failed to create endpoint. Status:", resp.Status)
-		return
+		return "", fmt.Errorf("failed to create endpoint. Status: %s", resp.Status)
 	}
 
 	var createResponse struct {
 		MockURL string `json:"mockUrl"`
 	}
-	json.NewDecoder(resp.Body).Decode(&createResponse)
+	err := json.NewDecoder(resp.Body).Decode(&createResponse)
+	if err != nil {
+		return "", fmt.Errorf("error decoding API response: %v", err)
+	}
 
-	fmt.Println("Endpoint created successfully!")
-	fmt.Println("Mock URL:", createResponse.MockURL)
+	return fmt.Sprintf("Endpoint created successfully!\nMock URL: %s", createResponse.MockURL), nil
 }
 
 // New private function
@@ -187,22 +206,26 @@ func loadFromFile(filePath string) map[string]interface{} {
 }
 
 func loadFromFlags(cmd *cobra.Command) map[string]interface{} {
-	method, _ := cmd.Flags().GetString("method")
-	httpStatus, _ := cmd.Flags().GetString("http-status")
-	contentType, _ := cmd.Flags().GetString("content-type")
-	charset, _ := cmd.Flags().GetString("charset")
-	body, _ := cmd.Flags().GetString("body")
+	endpointData := make(map[string]interface{})
 
-	if httpStatus == "" || contentType == "" || charset == "" || body == "" {
-		fmt.Println("All flags (--method, --http-status, --content-type, --charset, --body) are required when not using a file.")
-		os.Exit(1)
+	// Load all flags
+	endpointData["method"], _ = cmd.Flags().GetString("method")
+	endpointData["httpStatus"], _ = cmd.Flags().GetString("http-status")
+	endpointData["responseContentType"], _ = cmd.Flags().GetString("content-type")
+	endpointData["requestContentType"], _ = cmd.Flags().GetString("request-content-type")
+	endpointData["charset"], _ = cmd.Flags().GetString("charset")
+	endpointData["responseBody"], _ = cmd.Flags().GetString("body")
+	endpointData["responseBodySchema"], _ = cmd.Flags().GetString("response-body-schema")
+	endpointData["requestBodySchema"], _ = cmd.Flags().GetString("request-body-schema")
+	endpointData["authType"], _ = cmd.Flags().GetString("auth-type")
+	endpointData["authProperties"], _ = cmd.Flags().GetString("auth-properties")
+
+	// Remove empty values
+	for key, value := range endpointData {
+		if value == "" {
+			delete(endpointData, key)
+		}
 	}
 
-	return map[string]interface{}{
-		"method":              method,
-		"httpStatus":          httpStatus,
-		"responseContentType": contentType,
-		"charset":             charset,
-		"responseBody":        body,
-	}
+	return endpointData
 }

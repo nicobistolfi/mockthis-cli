@@ -1,7 +1,9 @@
 package commands
 
 import (
-	"encoding/json"
+	"bytes"
+	"io"
+	"net/http"
 	"os"
 	"reflect"
 	"testing"
@@ -142,31 +144,117 @@ func TestLoadFromFlags(t *testing.T) {
 	}
 }
 
-func TestCreateEndpoint(t *testing.T) {
-	// This test is more complex as it involves mocking HTTP requests and responses.
-	// For simplicity, we'll just test the JSON marshaling of the endpoint data.
-
-	cmd := &cobra.Command{}
-	cmd.Flags().String("method", "POST", "")
-	cmd.Flags().String("http-status", "201", "")
-	cmd.Flags().String("content-type", "application/json", "")
-	cmd.Flags().String("charset", "UTF-8", "")
-	cmd.Flags().String("body", `{"message": "Created"}`, "")
-
-	endpointData := loadFromFlags(cmd)
-	endpointData["httpStatus"], _ = json.Number("201").Int64()
-	endpointData["httpHeaders"] = map[string]string{}
-	endpointData["mockIdentifier"] = "default-mock-endpoint"
-	endpointData["body"] = endpointData["responseBody"] // Add this line
-
-	jsonData, err := json.Marshal(endpointData)
-	if err != nil {
-		t.Fatalf("Failed to marshal endpoint data: %v", err)
+func TestParseCommandArguments(t *testing.T) {
+	tests := []struct {
+		name     string
+		flags    map[string]string
+		expected map[string]interface{}
+		wantErr  bool
+	}{
+		{
+			name: "Valid flags",
+			flags: map[string]string{
+				"method":       "GET",
+				"http-status":  "200",
+				"content-type": "application/json",
+				"charset":      "UTF-8",
+				"body":         "Hello, World!",
+			},
+			expected: map[string]interface{}{
+				"method":              "GET",
+				"httpStatus":          200,
+				"responseContentType": "application/json",
+				"charset":             "UTF-8",
+				"responseBody":        "Hello, World!",
+			},
+			wantErr: false,
+		},
 	}
 
-	expected := `{"body":"{\"message\": \"Created\"}","charset":"UTF-8","httpHeaders":{},"httpStatus":201,"method":"POST","mockIdentifier":"default-mock-endpoint","responseBody":"{\"message\": \"Created\"}","responseContentType":"application/json"}`
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			cmd := &cobra.Command{}
+			for key, value := range tt.flags {
+				cmd.Flags().String(key, "", "")
+				cmd.Flags().Set(key, value)
+			}
+			result, err := parseCommandArguments(cmd)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("parseCommandArguments() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if result == nil && tt.expected != nil {
+				t.Errorf("parseCommandArguments() = nil, want %v", tt.expected)
+				return
+			}
+			if result != nil {
+				for key, expectedValue := range tt.expected {
+					if resultValue, ok := result[key]; !ok {
+						t.Errorf("parseCommandArguments() missing key %s", key)
+					} else if resultValue != expectedValue {
+						t.Errorf("parseCommandArguments() for key %s = %v, want %v", key, resultValue, expectedValue)
+					}
+				}
+				for key := range result {
+					if _, ok := tt.expected[key]; !ok {
+						t.Errorf("parseCommandArguments() unexpected key %s", key)
+					}
+				}
+			}
+		})
+	}
+}
 
-	if string(jsonData) != expected {
-		t.Errorf("Marshaled JSON does not match expected.\nGot:  %s\nWant: %s", string(jsonData), expected)
+func TestProcessAPIResponse(t *testing.T) {
+	tests := []struct {
+		name     string
+		input    *http.Response
+		expected string
+	}{
+		{
+			name: "Valid input",
+			input: &http.Response{
+				StatusCode: 200,
+				Status:     "200 OK",
+				Header:     http.Header{"Content-Type": []string{"application/json"}},
+				Body:       io.NopCloser(bytes.NewBufferString(`{"MockURL": "https://dev.api.mockthis.io/api/v1/endpoint/1234567890"}`)),
+			},
+			expected: "Endpoint created successfully!\nMock URL: https://dev.api.mockthis.io/api/v1/endpoint/1234567890",
+		},
+		{
+			name: "Unauthorized",
+			input: &http.Response{
+				StatusCode: 401,
+				Status:     "401 Unauthorized",
+				Body:       io.NopCloser(bytes.NewBufferString(`{"error": "Unauthorized"}`)),
+			},
+			expected: "failed to create endpoint. Status: 401 Unauthorized",
+		},
+		{
+			name: "Invalid input",
+			input: &http.Response{
+				StatusCode: 500,
+				Status:     "500 Internal Server Error",
+				Body:       io.NopCloser(bytes.NewBufferString(`{"error": "Internal Server Error"}`)),
+			},
+			expected: "failed to create endpoint. Status: 500 Internal Server Error",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			result, err := processAPIResponse(tt.input)
+			if err != nil {
+				// Handle the error
+				if err.Error() != tt.expected {
+					t.Errorf("processAPIResponse() returned an error: %v, want %v", err, tt.expected)
+				}
+			} else {
+				if !reflect.DeepEqual(result, tt.expected) {
+					t.Errorf("processAPIResponse() = %v, want %v", result, tt.expected)
+				}
+			}
+
+		})
 	}
 }
