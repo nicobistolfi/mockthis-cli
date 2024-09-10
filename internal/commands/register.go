@@ -44,10 +44,11 @@ func register(cmd *cobra.Command, args []string) {
 
 	var registerResponse struct {
 		Message string `json:"message"`
-		UserID  string `json:"userId"`
 	}
 	json.NewDecoder(resp.Body).Decode(&registerResponse)
 
 	fmt.Println(registerResponse.Message)
-	fmt.Println("User ID:", registerResponse.UserID)
+
+	// Call login command after successful registration
+	LoginCmd.Run(cmd, []string{email})
 }
