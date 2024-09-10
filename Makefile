@@ -1,8 +1,7 @@
 .PHONY: run build build-linux build-windows build-mac
 run:
 	go run cmd/mockthis/main.go
-
-.PHONY: build
+	
 build:
 	go build -o mockthis-cli cmd/mockthis/main.go
 
