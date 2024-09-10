@@ -40,7 +40,7 @@ func login(cmd *cobra.Command, args []string) {
 	defer resp.Body.Close()
 
 	if resp.StatusCode != http.StatusOK {
-		fmt.Println("Login failed. Please try again.")
+		fmt.Println("Login failed.\nIf you don't have an account, please sign by running `mt register`")
 		return
 	}
 
@@ -56,7 +56,7 @@ func login(cmd *cobra.Command, args []string) {
 	// Poll for token
 	token := pollForToken(email, loginResponse.LoginHash)
 	if token == "" {
-		fmt.Println("Login failed. Please try again.")
+		fmt.Println("Login failed - did you click the link on your emai? Please try again.")
 		return
 	}
 

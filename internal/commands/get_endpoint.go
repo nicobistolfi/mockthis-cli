@@ -112,7 +112,6 @@ func printEndpointDetails(endpoint map[string]interface{}) {
 		fmt.Printf("  Token: %s\n", authCredentials["token"])
 	}
 
-	fmt.Printf("Secret Token: %s\n", endpoint["secretToken"])
 	fmt.Printf("CURL: %s\n", endpoint["curl"])
 }
 
