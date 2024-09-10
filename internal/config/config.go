@@ -6,7 +6,7 @@ import (
 	"path/filepath"
 )
 
-const (
+var (
 	BaseURL   = "https://dev.api.mockthis.io/api/v1"
 	TokenFile = ".credentials"
 	ConfigDir = ".mockthis"
