@@ -5,7 +5,7 @@ issues:
   exclude-dirs:
     - vendor
     - third_party
-    - go/pkg/mod
+    - go
   # exclude-files:
   #   - ".*_test.go"
 
