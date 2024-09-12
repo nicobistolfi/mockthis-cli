@@ -130,8 +130,6 @@ func queryAPIEndpoint(endpointData map[string]interface{}) *http.Response {
 
 	jsonData, _ := json.Marshal(endpointData)
 
-	fmt.Println(string(jsonData))
-
 	req, _ := http.NewRequest("POST", config.BaseURL+"/endpoint", bytes.NewBuffer(jsonData))
 	req.Header.Set("Content-Type", "application/json")
 	req.Header.Set("Authorization", "Bearer "+configData.Token)
