@@ -14,6 +14,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
+// LoginCmd is the command to login to MockThis
 var LoginCmd = &cobra.Command{
 	Use:   "login [email]",
 	Short: "Login to MockThis",
@@ -48,7 +49,11 @@ func login(cmd *cobra.Command, args []string) {
 		Message   string `json:"message"`
 		LoginHash string `json:"loginHash"`
 	}
-	json.NewDecoder(resp.Body).Decode(&loginResponse)
+	err = json.NewDecoder(resp.Body).Decode(&loginResponse)
+	if err != nil {
+		fmt.Println("Error decoding response:", err)
+		return
+	}
 
 	fmt.Println(loginResponse.Message)
 	fmt.Println("Please check your email and click the magic link.")

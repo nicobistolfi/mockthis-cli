@@ -10,6 +10,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
+// UpdateEndpointCmd is the command to update an existing mock endpoint
 var UpdateEndpointCmd = &cobra.Command{
 	Use:   "update [id]",
 	Short: "Update an existing mock endpoint",

@@ -77,7 +77,11 @@ func TestLoadConfigError(t *testing.T) {
 	defer os.Setenv("HOME", os.Getenv("HOME"))
 
 	invalidJSON := []byte(`{"token": "test", "email": }`) // Invalid JSON
-	SaveConfig(TokenFile, string(invalidJSON))
+
+	err = SaveConfig(TokenFile, string(invalidJSON))
+	if err == nil {
+		t.Error("Expected an error when saving invalid JSON, but got nil")
+	}
 
 	_, err = LoadConfig(TokenFile)
 	if err == nil {

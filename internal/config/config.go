@@ -6,12 +6,14 @@ import (
 	"path/filepath"
 )
 
+// ConfigDir is the directory where the config file is stored
 var (
 	BaseURL   = "https://dev.api.mockthis.io/api/v1"
 	TokenFile = ".credentials"
 	ConfigDir = ".mockthis"
 )
 
+// ConfigData is the structure of the config file
 type ConfigData struct {
 	Token string `json:"token"`
 	Email string `json:"email"`

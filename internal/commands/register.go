@@ -10,6 +10,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
+// RegisterCmd is the command to register a new user
 var RegisterCmd = &cobra.Command{
 	Use:   "register",
 	Short: "Register a new user",
@@ -45,7 +46,11 @@ func register(cmd *cobra.Command, args []string) {
 	var registerResponse struct {
 		Message string `json:"message"`
 	}
-	json.NewDecoder(resp.Body).Decode(&registerResponse)
+	err = json.NewDecoder(resp.Body).Decode(&registerResponse)
+	if err != nil {
+		fmt.Println("Error decoding response:", err)
+		return
+	}
 
 	fmt.Println(registerResponse.Message)
 

@@ -68,8 +68,16 @@ func TestLoadFromFile(t *testing.T) {
 		t.Fatal(err)
 	}
 	defer os.Remove(jsonFile.Name())
-	jsonFile.Write([]byte(jsonContent))
-	jsonFile.Close()
+
+	_, err = jsonFile.Write([]byte(jsonContent))
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	err = jsonFile.Close()
+	if err != nil {
+		t.Fatal(err)
+	}
 
 	// Create a temporary YAML file
 	yamlContent := "method: GET\nhttpStatus: 200\nresponseContentType: text/plain"
@@ -78,8 +86,15 @@ func TestLoadFromFile(t *testing.T) {
 		t.Fatal(err)
 	}
 	defer os.Remove(yamlFile.Name())
-	yamlFile.Write([]byte(yamlContent))
-	yamlFile.Close()
+	_, err = yamlFile.Write([]byte(yamlContent))
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	err = yamlFile.Close()
+	if err != nil {
+		t.Fatal(err)
+	}
 
 	tests := []struct {
 		name     string
@@ -116,6 +131,7 @@ func TestLoadFromFile(t *testing.T) {
 	}
 }
 
+// nolint
 func TestLoadFromFlags(t *testing.T) {
 	cmd := &cobra.Command{}
 	cmd.Flags().String("method", "", "")
@@ -176,6 +192,7 @@ func TestParseCommandArguments(t *testing.T) {
 			cmd := &cobra.Command{}
 			for key, value := range tt.flags {
 				cmd.Flags().String(key, "", "")
+				//nolint
 				cmd.Flags().Set(key, value)
 			}
 			result, err := parseCommandArguments(cmd)
