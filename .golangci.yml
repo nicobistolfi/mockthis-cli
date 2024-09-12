@@ -1,0 +1,21 @@
+run:
+  go: '1.22'
+
+issues:
+  exclude-dirs:
+    - vendor
+    - third_party
+  # exclude-files:
+  #   - ".*_test.go"
+
+linters:
+  enable:
+    - gofmt
+    - govet
+    - errcheck
+    - typecheck
+    - unused
+    - gocyclo
+    - goconst
+    # - gocognit # Diabling for now
+    - gocritic
