@@ -12,6 +12,9 @@ import (
 
 	"github.com/nicobistolfi/mockthis-cli/internal/config"
 	"github.com/spf13/cobra"
+	"github.com/spf13/pflag"
+	"golang.org/x/text/cases"
+	"golang.org/x/text/language"
 	"gopkg.in/yaml.v2"
 )
 
@@ -77,14 +80,36 @@ func parseCommandArguments(cmd *cobra.Command) (map[string]interface{}, error) {
 	}
 
 	// Ensure correct types for specific fields
-	endpointData["method"] = endpointData["method"].(string)
-	endpointData["responseContentType"] = endpointData["responseContentType"].(string)
-	endpointData["charset"] = endpointData["charset"].(string)
-	endpointData["responseBody"] = endpointData["responseBody"].(string)
+	if method, ok := endpointData["method"].(string); ok {
+		endpointData["method"] = method
+	} else {
+		endpointData["method"] = "GET"
+	}
+
+	if responseContentType, ok := endpointData["responseContentType"].(string); ok {
+		endpointData["responseContentType"] = responseContentType
+	} else {
+		endpointData["responseContentType"] = "application/json"
+	}
+
+	if charset, ok := endpointData["charset"].(string); ok {
+		endpointData["charset"] = charset
+	} else {
+		endpointData["charset"] = "UTF-8"
+	}
+
+	if responseBody, ok := endpointData["responseBody"].(string); ok {
+		endpointData["responseBody"] = responseBody
+	} else {
+		return nil, fmt.Errorf("responseBody is not a string or is missing")
+	}
 
 	for _, field := range []string{"responseBodySchema", "requestContentType", "requestBodySchema"} {
-		if value, ok := endpointData[field]; ok {
-			endpointData[field] = value.(string)
+		if value, ok := endpointData[field].(string); ok {
+			endpointData[field] = value
+		} else {
+			// If the field is missing or not a string, remove it from the map
+			delete(endpointData, field)
 		}
 	}
 
@@ -104,8 +129,6 @@ func queryAPIEndpoint(endpointData map[string]interface{}) *http.Response {
 	configData := getConfig()
 
 	jsonData, _ := json.Marshal(endpointData)
-
-	fmt.Println(string(jsonData))
 
 	req, _ := http.NewRequest("POST", config.BaseURL+"/endpoint", bytes.NewBuffer(jsonData))
 	req.Header.Set("Content-Type", "application/json")
@@ -208,24 +231,34 @@ func loadFromFile(filePath string) map[string]interface{} {
 func loadFromFlags(cmd *cobra.Command) map[string]interface{} {
 	endpointData := make(map[string]interface{})
 
-	// Load all flags
-	endpointData["method"], _ = cmd.Flags().GetString("method")
-	endpointData["httpStatus"], _ = cmd.Flags().GetString("http-status")
-	endpointData["responseContentType"], _ = cmd.Flags().GetString("content-type")
-	endpointData["requestContentType"], _ = cmd.Flags().GetString("request-content-type")
-	endpointData["charset"], _ = cmd.Flags().GetString("charset")
-	endpointData["responseBody"], _ = cmd.Flags().GetString("body")
-	endpointData["responseBodySchema"], _ = cmd.Flags().GetString("response-body-schema")
-	endpointData["requestBodySchema"], _ = cmd.Flags().GetString("request-body-schema")
-	endpointData["authType"], _ = cmd.Flags().GetString("auth-type")
-	endpointData["authProperties"], _ = cmd.Flags().GetString("auth-properties")
-
-	// Remove empty values
-	for key, value := range endpointData {
-		if value == "" {
-			delete(endpointData, key)
-		}
+	// Custom flag mappings
+	flagMappings := map[string]string{
+		"body":                 "responseBody",
+		"content-type":         "responseContentType",
+		"request-content-type": "requestContentType",
 	}
 
+	cmd.Flags().VisitAll(func(flag *pflag.Flag) {
+		if flag.Changed {
+			key := flag.Name
+			if mappedKey, exists := flagMappings[key]; exists {
+				key = mappedKey
+			} else {
+				key = toCamelCase(key)
+			}
+			value := flag.Value.String()
+			endpointData[key] = value
+		}
+	})
+
 	return endpointData
+}
+
+func toCamelCase(s string) string {
+	parts := strings.Split(s, "-")
+	caser := cases.Title(language.Und)
+	for i := 1; i < len(parts); i++ {
+		parts[i] = caser.String(parts[i])
+	}
+	return strings.Join(parts, "")
 }
