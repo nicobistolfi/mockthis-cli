@@ -13,8 +13,8 @@ var (
 	ConfigDir = ".mockthis"
 )
 
-// ConfigData is the structure of the config file
-type ConfigData struct {
+// Data is the structure of the config file
+type Data struct {
 	Token string `json:"token"`
 	Email string `json:"email"`
 }
@@ -27,14 +27,14 @@ func SaveConfig(filename, data string) error {
 	return os.WriteFile(filepath.Join(configPath, filename), []byte(data), 0600)
 }
 
-func LoadConfig(filename string) (*ConfigData, error) {
+func LoadConfig(filename string) (*Data, error) {
 	configPath := filepath.Join(os.Getenv("HOME"), ConfigDir, filename)
 	data, err := os.ReadFile(configPath)
 	if err != nil {
 		return nil, err
 	}
 
-	var config ConfigData
+	var config Data
 	err = json.Unmarshal(data, &config)
 	if err != nil {
 		return nil, err

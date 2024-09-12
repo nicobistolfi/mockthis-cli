@@ -117,7 +117,7 @@ func parseCommandArguments(cmd *cobra.Command) (map[string]interface{}, error) {
 	return endpointData, nil
 }
 
-func getConfig() *config.ConfigData {
+func getConfig() *config.Data {
 	configData, err := config.LoadConfig(config.TokenFile)
 	if err != nil {
 		fmt.Println("You need to login first.")
