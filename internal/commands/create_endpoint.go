@@ -15,9 +15,10 @@ import (
 	"github.com/spf13/pflag"
 	"golang.org/x/text/cases"
 	"golang.org/x/text/language"
-	"gopkg.in/yaml.v2"
+	yaml "gopkg.in/yaml.v2"
 )
 
+// CreateEndpointCmd is the command to create a new mock endpoint
 var CreateEndpointCmd = &cobra.Command{
 	Use:   "create [--file <path>] [--method <method>] [--http-status <code>] [--content-type <type>] [--charset <charset>] [--body <body>] [--auth-type <type>] [--auth-properties <properties>]",
 	Short: "Create a new mock endpoint",
@@ -116,7 +117,7 @@ func parseCommandArguments(cmd *cobra.Command) (map[string]interface{}, error) {
 	return endpointData, nil
 }
 
-func getConfig() *config.ConfigData {
+func getConfig() *config.Data {
 	configData, err := config.LoadConfig(config.TokenFile)
 	if err != nil {
 		fmt.Println("You need to login first.")

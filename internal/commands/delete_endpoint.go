@@ -8,6 +8,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
+// DeleteEndpointCmd is the command to delete an existing mock endpoint
 var DeleteEndpointCmd = &cobra.Command{
 	Use:   "delete [id]",
 	Short: "Delete an existing mock endpoint",

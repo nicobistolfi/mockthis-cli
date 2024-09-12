@@ -26,7 +26,7 @@ func TestSaveAndLoadConfig(t *testing.T) {
 	defer os.Setenv("HOME", originalHome)
 
 	// Test data
-	testConfig := ConfigData{
+	testConfig := Data{
 		Token: "test_token",
 		Email: "test@example.com",
 	}
@@ -77,7 +77,11 @@ func TestLoadConfigError(t *testing.T) {
 	defer os.Setenv("HOME", os.Getenv("HOME"))
 
 	invalidJSON := []byte(`{"token": "test", "email": }`) // Invalid JSON
-	SaveConfig(TokenFile, string(invalidJSON))
+
+	err = SaveConfig(TokenFile, string(invalidJSON))
+	if err != nil {
+		t.Error("Could not save invalid JSON")
+	}
 
 	_, err = LoadConfig(TokenFile)
 	if err == nil {

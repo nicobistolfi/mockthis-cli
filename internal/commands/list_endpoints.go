@@ -13,6 +13,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
+// ListEndpointsCmd is the command to list all created mock endpoints
 var ListEndpointsCmd = &cobra.Command{
 	Use:   "list",
 	Short: "List all created mock endpoints",
@@ -51,7 +52,7 @@ func listEndpoints(cmd *cobra.Command, args []string) {
 
 	var endpoints []struct {
 		ID             string    `json:"id"`
-		HttpStatus     int       `json:"httpStatus"`
+		HTTPStatus     int       `json:"httpStatus"`
 		CreatedAt      time.Time `json:"createdAt"`
 		MockIdentifier string    `json:"mockIdentifier"`
 		EndpointURL    string    `json:"endpointUrl"`
@@ -73,7 +74,7 @@ func listEndpoints(cmd *cobra.Command, args []string) {
 			e.MockIdentifier,
 			e.ID,
 			method,
-			e.HttpStatus,
+			e.HTTPStatus,
 			e.CreatedAt.Format("2006-01-02 15:04:05"),
 			e.EndpointURL)
 	}

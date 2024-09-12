@@ -10,6 +10,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
+// GetEndpointCmd is the command to get details of an existing mock endpoint
 var GetEndpointCmd = &cobra.Command{
 	Use:   "get [id or mockIdentifier]",
 	Short: "Get details of an endpoint",
