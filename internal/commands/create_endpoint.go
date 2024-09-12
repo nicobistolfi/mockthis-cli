@@ -15,7 +15,7 @@ import (
 	"github.com/spf13/pflag"
 	"golang.org/x/text/cases"
 	"golang.org/x/text/language"
-	"gopkg.in/yaml.v2"
+	yaml "gopkg.in/yaml.v2"
 )
 
 // CreateEndpointCmd is the command to create a new mock endpoint

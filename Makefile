@@ -6,7 +6,7 @@ test:
 	go test ./...
 
 build:
-	go build -o mockthis-cli cmd/mockthis/main.go
+	go build -o mockthis cmd/mockthis/main.go
 
 build-linux:
 	GOOS=linux GOARCH=amd64 go build -o ./bin/mockthis-linux-amd64 cmd/mockthis/main.go
