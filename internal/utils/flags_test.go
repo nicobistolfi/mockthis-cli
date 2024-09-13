@@ -51,7 +51,7 @@ endpoint:
 	cmd.Flags().String("body", "Hello, World! 🌎", "Response body")
 
 	// Authentication
-	cmd.Flags().String("auth-type", "", "Authentication type (basic, api-key, bearer-token, oauth2, jwt)")
+	cmd.Flags().String("auth-type", "", "Authentication type (basic, apiKey, bearer, oauth2, jwt)")
 	cmd.Flags().String("auth-properties", "", "Authentication properties (comma-separated key=value pairs)")
 
 	// Request

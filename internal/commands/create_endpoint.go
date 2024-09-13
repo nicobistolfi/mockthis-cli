@@ -39,7 +39,7 @@ func init() {
 	CreateEndpointCmd.Flags().String("body", "Hello, World! 🌎", "Response body")
 
 	// Authentication
-	CreateEndpointCmd.Flags().String("auth-type", "", "Authentication type (basic, api-key, bearer-token, oauth2, jwt)")
+	CreateEndpointCmd.Flags().String("auth-type", "", "Authentication type (basic, apiKey, bearer, oauth2, jwt)")
 	CreateEndpointCmd.Flags().String("auth-properties", "", "Authentication properties (comma-separated key=value pairs)")
 
 	// Request
@@ -280,7 +280,7 @@ func processAuthCredentials(authType, authProperties string) map[string]interfac
 	case "jwt":
 		authCredentials["token"] = authPropertiesMap["token"]
 	default:
-		fmt.Println("Invalid authentication type. Supported types: basic, api-key, bearer-token, oauth2, jwt")
+		fmt.Println("Invalid authentication type. Supported types: basic, apikey, bearer, oauth2, jwt. Got:", authType)
 		os.Exit(1)
 	}
 

@@ -2,7 +2,6 @@ package commands
 
 import (
 	"bytes"
-	"fmt"
 	"io"
 	"net/http"
 	"path"
@@ -34,10 +33,10 @@ func TestProcessAuthCredentials(t *testing.T) {
 		},
 		{
 			name:           "API Key",
-			authType:       "api-key",
+			authType:       "apiKey",
 			authProperties: "name=api_key,value=12345,in=header",
 			expected: map[string]interface{}{
-				"type":  "api-key",
+				"type":  "apiKey",
 				"name":  "api_key",
 				"value": "12345",
 				"in":    "header",
@@ -45,10 +44,10 @@ func TestProcessAuthCredentials(t *testing.T) {
 		},
 		{
 			name:           "Bearer Token",
-			authType:       "bearer-token",
+			authType:       "bearer",
 			authProperties: "token=abcdef123456",
 			expected: map[string]interface{}{
-				"type":  "bearer-token",
+				"type":  "bearer",
 				"token": "abcdef123456",
 			},
 		},
@@ -264,11 +263,7 @@ func TestLoadFromFile(t *testing.T) {
 				cmd.Flags().AddFlag(flag)
 			})
 
-			fmt.Println("file path", tt.filePath)
-
 			err := loadFromFile(tt.filePath, cmd)
-			fmt.Println("error", err)
-
 			if (err != nil) != tt.wantErr {
 				t.Errorf("loadFromFile() error = %v, wantErr %v", err, tt.wantErr)
 				return
