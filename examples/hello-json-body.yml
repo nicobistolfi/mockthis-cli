@@ -1,0 +1,9 @@
+# Hello endpoint with basic auth -> mockthis create --file ./examples/hello.yml
+endpoint:
+  response:
+    body:
+      |
+      {
+        "hello": "world",
+        "foo": "bar"
+      }

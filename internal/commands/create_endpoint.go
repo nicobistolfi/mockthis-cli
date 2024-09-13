@@ -11,11 +11,11 @@ import (
 	"strings"
 
 	"github.com/nicobistolfi/mockthis-cli/internal/config"
+	"github.com/nicobistolfi/mockthis-cli/internal/utils"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
 	"golang.org/x/text/cases"
 	"golang.org/x/text/language"
-	yaml "gopkg.in/yaml.v2"
 )
 
 // CreateEndpointCmd is the command to create a new mock endpoint
@@ -68,11 +68,11 @@ func parseCommandArguments(cmd *cobra.Command) (map[string]interface{}, error) {
 
 	filePath, _ := cmd.Flags().GetString("file")
 	if filePath != "" {
-		endpointData = loadFromFile(filePath)
-	} else {
-		endpointData = loadFromFlags(cmd)
+		loadFromFile(filePath, cmd)
 	}
+	endpointData = loadFromFlags(cmd)
 
+	fmt.Println(endpointData)
 	// Convert httpStatus to int
 	if httpStatus, ok := endpointData["httpStatus"].(string); ok {
 		endpointData["httpStatus"], _ = strconv.Atoi(httpStatus)
@@ -178,12 +178,16 @@ func processAuthCredentials(authType, authProperties string) map[string]interfac
 	}
 
 	authPropertiesMap := make(map[string]interface{})
-	propertyPairs := strings.Split(authProperties, ",")
+	if utils.IsJSON(authProperties) {
+		json.Unmarshal([]byte(authProperties), &authPropertiesMap)
+	} else {
+		propertyPairs := strings.Split(authProperties, ",")
 
-	for _, pair := range propertyPairs {
-		parts := strings.Split(pair, "=")
-		if len(parts) == 2 {
-			authPropertiesMap[strings.TrimSpace(parts[0])] = strings.TrimSpace(parts[1])
+		for _, pair := range propertyPairs {
+			parts := strings.Split(pair, "=")
+			if len(parts) == 2 {
+				authPropertiesMap[strings.TrimSpace(parts[0])] = strings.TrimSpace(parts[1])
+			}
 		}
 	}
 
@@ -212,33 +216,32 @@ func processAuthCredentials(authType, authProperties string) map[string]interfac
 	return authCredentials
 }
 
-func loadFromFile(filePath string) map[string]interface{} {
-	data, err := os.ReadFile(filePath)
+func loadFromFile(filePath string, cmd *cobra.Command) error {
+	data, err := utils.LoadFile(filePath)
 	if err != nil {
 		fmt.Printf("Error reading file: %v\n", err)
-		os.Exit(1)
+		return err
 	}
 
 	var endpointData map[string]interface{}
-	if ext := filepath.Ext(filePath); ext == ".json" {
-		err = json.Unmarshal(data, &endpointData)
-	} else if ext == ".yaml" || ext == ".yml" {
-		err = yaml.Unmarshal(data, &endpointData)
+	ext := filepath.Ext(filePath)
+
+	if utils.IsJSON(data) {
+		endpointData, err = utils.ParseJSON(data)
+	} else if utils.IsYAML(data) {
+		endpointData, err = utils.ParseYAML(data)
 	} else {
-		fmt.Println("Unsupported file format. Use JSON or YAML.")
-		os.Exit(1)
+		fmt.Printf("Unsupported file format: %s. Use JSON or YAML.\n", ext)
+		return err
 	}
 
 	if err != nil {
 		fmt.Printf("Error parsing file: %v\n", err)
-		os.Exit(1)
+		return err
 	}
 
-	fmt.Println(endpointData)
-
-	os.Exit(1)
-
-	return endpointData
+	utils.MapToFlags(endpointData["endpoint"].(map[string]interface{}), cmd)
+	return nil
 }
 
 func loadFromFlags(cmd *cobra.Command) map[string]interface{} {

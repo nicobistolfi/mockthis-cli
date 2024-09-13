@@ -8,10 +8,9 @@ endpoint:
   response:
     method: GET
     http-status: 200
-    content-type: application/json
+    content-type: plain/text
     charset: UTF-8
     headers:
-      Content-Type: application/json
       X-Random-Header: MockThis Random Header
     schema:
       type: string
