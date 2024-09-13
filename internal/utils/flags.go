@@ -49,10 +49,12 @@ func handleNestedMap(prefix string, data map[string]interface{}, cmd *cobra.Comm
 		switch v := value.(type) {
 		case map[string]interface{}:
 			// Stringify nested map instead of recursing
-			jsonString, err := json.Marshal(v)
-			if err == nil {
-				err = cmd.Flags().Set(fullKey, string(jsonString))
+			jsonString, errJSON := json.Marshal(v)
+			if errJSON != nil {
+				fmt.Println("Error marshalling JSON:", errJSON)
+				os.Exit(1)
 			}
+			err = cmd.Flags().Set(fullKey, string(jsonString))
 		case string:
 			err = cmd.Flags().Set(fullKey, v)
 		case int:
