@@ -1,0 +1,19 @@
+# GET with Bearer Token authentication
+auth:
+  type: bearer
+  properties:
+    token: your-bearer-token-here
+response:
+  method: GET
+  http-status: 200
+  content-type: application/json
+  charset: UTF-8
+  headers:
+    X-Example-Header: GET with Bearer Token Example
+  schema:
+    type: object
+  body: |
+    {
+      "message": "Authenticated with Bearer Token",
+      "timestamp": "2024-09-13T12:05:00Z"
+    }

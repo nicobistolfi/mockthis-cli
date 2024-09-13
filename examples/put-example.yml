@@ -1,0 +1,25 @@
+# PUT example
+response:
+  method: PUT
+  http-status: 200
+  content-type: application/json
+  charset: UTF-8
+  headers:
+    X-Example-Header: PUT Example
+  schema:
+    type: object
+  body: |
+    {
+      "id": "123456",
+      "message": "Resource replaced successfully",
+      "timestamp": "2024-09-13T12:03:00Z"
+    }
+request:
+  content-type: application/json
+  schema:
+    type: object
+    properties:
+      name:
+        type: string
+      email:
+        type: string
