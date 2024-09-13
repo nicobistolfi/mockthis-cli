@@ -6,7 +6,6 @@ import (
 	"os"
 
 	"github.com/spf13/cobra"
-	"github.com/spf13/pflag"
 )
 
 // MapToFlags sets values for existing flags in a cobra.Command
@@ -32,9 +31,9 @@ func MapToFlags(data map[string]interface{}, cmd *cobra.Command) {
 	}
 
 	// Print the flags
-	cmd.Flags().VisitAll(func(flag *pflag.Flag) {
-		fmt.Printf("Flag: %s=%s\n", flag.Name, flag.Value)
-	})
+	// cmd.Flags().VisitAll(func(flag *pflag.Flag) {
+	// 	fmt.Printf("Flag: %s=%s\n", flag.Name, flag.Value)
+	// })
 }
 
 func handleNestedMap(prefix string, data map[string]interface{}, cmd *cobra.Command) {

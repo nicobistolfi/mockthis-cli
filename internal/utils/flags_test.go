@@ -38,7 +38,25 @@ endpoint:
 	cmd := &cobra.Command{}
 
 	// Create flags before calling MapToFlags
-	createFlags(cmd, data["endpoint"].(map[string]interface{}))
+	// File
+	cmd.Flags().StringP("file", "f", "", "Path to JSON or YAML file containing endpoint data")
+
+	// Response
+	cmd.Flags().String("method", "GET", "HTTP method (GET, POST, PUT, DELETE, etc.)")
+	cmd.Flags().String("http-status", "200", "HTTP status code")
+	cmd.Flags().String("content-type", "application/json", "Response Content-Type")
+	cmd.Flags().String("charset", "UTF-8", "Charset")
+	cmd.Flags().String("headers", "", "Response headers (comma-separated key=value pairs)")
+	cmd.Flags().String("schema", "", "JSON Schema to validate the response body")
+	cmd.Flags().String("body", "Hello, World! 🌎", "Response body")
+
+	// Authentication
+	cmd.Flags().String("auth-type", "", "Authentication type (basic, api-key, bearer-token, oauth2, jwt)")
+	cmd.Flags().String("auth-properties", "", "Authentication properties (comma-separated key=value pairs)")
+
+	// Request
+	cmd.Flags().String("request-content-type", "application/json", "Request Content-Type")
+	cmd.Flags().String("request-schema", "", "JSON Schema to validate the request body")
 
 	MapToFlags(data["endpoint"].(map[string]interface{}), cmd)
 
@@ -47,18 +65,15 @@ endpoint:
 		value string
 	}{
 		{"auth-type", "basic"},
-		{"auth-properties-username", "admin"},
-		{"auth-properties-password", "admin"},
-		{"response-method", "GET"},
-		{"response-http-status", "200"},
-		{"response-content-type", "application/json"},
-		{"response-charset", "UTF-8"},
-		{"response-headers-Content-Type", "application/json"},
-		{"response-headers-X-Random-Header", "MockThis Random Header"},
-		{"response-schema-type", "string"},
-		{"response-body", "Hello, World! 🌎"},
+		{"auth-properties", "{\"password\":\"admin\",\"username\":\"admin\"}"},
+		{"method", "GET"},
+		{"http-status", "200"},
+		{"content-type", "application/json"},
+		{"charset", "UTF-8"},
+		{"headers", "{\"Content-Type\":\"application/json\",\"X-Random-Header\":\"MockThis Random Header\"}"},
+		{"schema", "{\"type\":\"string\"}"},
+		{"body", "Hello, World! 🌎"},
 		{"request-content-type", "application/json"},
-		{"request-schema-type", "string"},
 	}
 
 	for _, ef := range expectedFlags {
@@ -85,6 +100,8 @@ endpoint:
 
 	cmd := &cobra.Command{}
 
+	cmd.Flags().String("body", "", "Response body")
+
 	// Create flags before calling MapToFlags
 	createFlags(cmd, data["endpoint"].(map[string]interface{}))
 
@@ -94,7 +111,7 @@ endpoint:
 		name  string
 		value string
 	}{
-		{"response-body", "{\n  \"hello\": \"world\",\n  \"foo\": \"bar\"\n}\n"},
+		{"body", "{\n  \"hello\": \"world\",\n  \"foo\": \"bar\"\n}\n"},
 	}
 
 	for _, ef := range expectedFlags {
