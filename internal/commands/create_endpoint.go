@@ -20,23 +20,31 @@ import (
 
 // CreateEndpointCmd is the command to create a new mock endpoint
 var CreateEndpointCmd = &cobra.Command{
-	Use:   "create [--file <path>] [--method <method>] [--http-status <code>] [--content-type <type>] [--charset <charset>] [--body <body>] [--auth-type <type>] [--auth-properties <properties>]",
+	Use:   "create [--file <path>] [--auth-type <type>] [--auth-properties <properties>] [--request-content-type <type>] [--request-schema <schema>] [--method <method>] [--http-status <status>] [--content-type <type>] [--charset <charset>] [--headers <headers>] [--schema <schema>] [--body <body>]",
 	Short: "Create a new mock endpoint",
 	Run:   createEndpoint,
 }
 
 func init() {
+	// File
 	CreateEndpointCmd.Flags().StringP("file", "f", "", "Path to JSON or YAML file containing endpoint data")
+
+	// Response
 	CreateEndpointCmd.Flags().String("method", "GET", "HTTP method (GET, POST, PUT, DELETE, etc.)")
 	CreateEndpointCmd.Flags().String("http-status", "200", "HTTP status code")
 	CreateEndpointCmd.Flags().String("content-type", "application/json", "Response Content-Type")
-	CreateEndpointCmd.Flags().String("request-content-type", "application/json", "Request Content-Type")
 	CreateEndpointCmd.Flags().String("charset", "UTF-8", "Charset")
+	CreateEndpointCmd.Flags().String("headers", "", "Response headers (comma-separated key=value pairs)")
+	CreateEndpointCmd.Flags().String("schema", "", "JSON Schema to validate the response body")
 	CreateEndpointCmd.Flags().String("body", "Hello, World! 🌎", "Response body")
-	CreateEndpointCmd.Flags().String("response-body-schema", "", "JSON Schema to validate the response body")
-	CreateEndpointCmd.Flags().String("request-body-schema", "", "JSON Schema to validate the request body")
+
+	// Authentication
 	CreateEndpointCmd.Flags().String("auth-type", "", "Authentication type (basic, api-key, bearer-token, oauth2, jwt)")
 	CreateEndpointCmd.Flags().String("auth-properties", "", "Authentication properties (comma-separated key=value pairs)")
+
+	// Request
+	CreateEndpointCmd.Flags().String("request-content-type", "application/json", "Request Content-Type")
+	CreateEndpointCmd.Flags().String("request-schema", "", "JSON Schema to validate the request body")
 }
 
 func createEndpoint(cmd *cobra.Command, args []string) {
@@ -226,6 +234,10 @@ func loadFromFile(filePath string) map[string]interface{} {
 		os.Exit(1)
 	}
 
+	fmt.Println(endpointData)
+
+	os.Exit(1)
+
 	return endpointData
 }
 
@@ -237,6 +249,8 @@ func loadFromFlags(cmd *cobra.Command) map[string]interface{} {
 		"body":                 "responseBody",
 		"content-type":         "responseContentType",
 		"request-content-type": "requestContentType",
+		"schema":               "responseBodySchema",
+		"request-schema":       "requestBodySchema",
 	}
 
 	cmd.Flags().VisitAll(func(flag *pflag.Flag) {

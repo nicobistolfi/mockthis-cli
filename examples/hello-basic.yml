@@ -1,0 +1,22 @@
+# Hello endpoint with basic auth -> mockthis create --file ./examples/hello.yml
+endpoint:
+  auth:
+    type: basic
+    properties:
+      username: admin
+      password: admin
+  response:
+    method: GET
+    http-status: 200
+    content-type: application/json
+    charset: UTF-8
+    headers:
+      Content-Type: application/json
+      X-Random-Header: MockThis Random Header
+    schema:
+      type: string
+    body: Hello, World! 🌎
+  request:
+    content-type: application/json
+    schema:
+      type: string

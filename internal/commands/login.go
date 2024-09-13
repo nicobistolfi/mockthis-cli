@@ -108,21 +108,12 @@ func pollForToken(email, hash string) string {
 }
 
 func saveCredentials(email, token string) {
-	credentials := struct {
-		Email string `json:"email"`
-		Token string `json:"token"`
-	}{
+	credentials := &config.Data{
 		Email: email,
 		Token: token,
 	}
 
-	jsonData, err := json.MarshalIndent(credentials, "", "  ")
-	if err != nil {
-		fmt.Println("Error creating credentials JSON:", err)
-		return
-	}
-
-	if err := config.SaveConfig(config.TokenFile, string(jsonData)); err != nil {
+	if err := config.SaveConfig(config.TokenFile, credentials); err != nil {
 		fmt.Println("Error saving credentials:", err)
 		return
 	}

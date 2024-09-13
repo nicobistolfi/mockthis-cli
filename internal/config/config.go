@@ -1,9 +1,11 @@
 package config
 
 import (
-	"encoding/json"
+	"errors"
 	"os"
 	"path/filepath"
+
+	"github.com/nicobistolfi/mockthis-cli/internal/utils"
 )
 
 // ConfigDir is the directory where the config file is stored
@@ -20,27 +22,57 @@ type Data struct {
 }
 
 // SaveConfig saves the config to the config file
-func SaveConfig(filename, data string) error {
-	configPath := filepath.Join(os.Getenv("HOME"), ConfigDir)
-	if err := os.MkdirAll(configPath, 0700); err != nil {
+func SaveConfig(filename string, data *Data) error {
+	configPath := filepath.Join(os.Getenv("HOME"), ConfigDir, filename)
+	jsonData, err := utils.ToYAML(data)
+	if err != nil {
 		return err
 	}
-	return os.WriteFile(filepath.Join(configPath, filename), []byte(data), 0600)
+	return utils.WriteFile(configPath, jsonData)
 }
 
 // LoadConfig loads the config from the config file
 func LoadConfig(filename string) (*Data, error) {
 	configPath := filepath.Join(os.Getenv("HOME"), ConfigDir, filename)
-	data, err := os.ReadFile(configPath)
+	data, err := utils.LoadFile(configPath)
 	if err != nil {
 		return nil, err
 	}
 
-	var config Data
-	err = json.Unmarshal(data, &config)
-	if err != nil {
-		return nil, err
+	var parsedData map[string]interface{}
+
+	if utils.IsJSON(data) {
+		parsedDataJSON, err := utils.ParseJSON(data)
+		parsedData = parsedDataJSON
+		if err != nil {
+			return nil, err
+		}
 	}
 
-	return &config, nil
+	if utils.IsYAML(data) {
+		parsedDataYAML, err := utils.ParseYAML(data)
+		parsedData = parsedDataYAML
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	if parsedData == nil {
+		return nil, errors.New("config file is not a valid JSON or YAML")
+	}
+
+	if _, ok := parsedData["token"]; !ok {
+		return nil, errors.New("token not found in config file")
+	}
+
+	if _, ok := parsedData["email"]; !ok {
+		return nil, errors.New("email not found in config file")
+	}
+
+	config := &Data{
+		Token: parsedData["token"].(string),
+		Email: parsedData["email"].(string),
+	}
+
+	return config, nil
 }
