@@ -75,7 +75,6 @@ func parseCommandArguments(cmd *cobra.Command) (map[string]interface{}, error) {
 	}
 	endpointData = loadFromFlags(cmd)
 
-	fmt.Println(endpointData)
 	// Convert httpStatus to int
 	if httpStatus, ok := endpointData["httpStatus"].(string); ok {
 		endpointData["httpStatus"], _ = strconv.Atoi(httpStatus)
@@ -113,7 +112,7 @@ func parseCommandArguments(cmd *cobra.Command) (map[string]interface{}, error) {
 	if responseBody, ok := endpointData["responseBody"].(string); ok {
 		endpointData["responseBody"] = responseBody
 	} else {
-		return nil, fmt.Errorf("responseBody is not a string or is missing")
+		endpointData["responseBody"] = nil
 	}
 
 	for _, field := range []string{"responseBodySchema", "requestContentType", "requestBodySchema"} {
@@ -164,14 +163,79 @@ func processAPIResponse(resp *http.Response) (string, error) {
 	}
 
 	var createResponse struct {
-		MockURL string `json:"mockUrl"`
+		MockURL  string                 `json:"mockUrl"`
+		ID       string                 `json:"id"`
+		Endpoint map[string]interface{} `json:"endpoint"`
 	}
 	err := json.NewDecoder(resp.Body).Decode(&createResponse)
 	if err != nil {
 		return "", fmt.Errorf("error decoding API response: %v", err)
 	}
 
-	return fmt.Sprintf("Endpoint created successfully!\nMock URL: %s", createResponse.MockURL), nil
+	table := buildTableFromMap(createResponse.Endpoint)
+
+	return fmt.Sprintf("Endpoint created successfully!\nMock URL: %s\n\n%s", createResponse.MockURL, table), nil
+}
+
+// Print a table from a map and keep it aligned to the left
+func buildTableFromMap(data map[string]interface{}) string {
+	// Define the order of keys
+	order := []string{"ID", "Method", "HTTPStatus", "ResponseContentType", "ResponseBody"}
+
+	// Find the maximum width for each column
+	maxKeyWidth := 5   // minimum width for "Field"
+	maxValueWidth := 5 // minimum width for "Value"
+	for key, value := range data {
+		keyWidth := len(key)
+		valueWidth := len(fmt.Sprintf("%v", value))
+		if keyWidth > maxKeyWidth {
+			maxKeyWidth = keyWidth
+		}
+		if valueWidth > maxValueWidth {
+			maxValueWidth = valueWidth
+		}
+	}
+
+	// Create the format string for each row
+	rowFormat := fmt.Sprintf("| %%-%ds | %%-%ds |\n", maxKeyWidth, maxValueWidth)
+
+	// Build the table
+	var tableBuilder strings.Builder
+	tableBuilder.WriteString(fmt.Sprintf(rowFormat, "Field", "Value"))
+	tableBuilder.WriteString(fmt.Sprintf("+%s+%s+\n", strings.Repeat("-", maxKeyWidth+2), strings.Repeat("-", maxValueWidth+2)))
+
+	// First, add rows for ordered keys
+	for _, key := range order {
+		if value, exists := data[key]; exists && value != nil && value != "" {
+			fmt.Fprintf(&tableBuilder, rowFormat, key, formatValue(value))
+			delete(data, key)
+		}
+	}
+
+	// Then, add rows for remaining keys
+	for key, value := range data {
+		if value != nil && value != "" {
+			fmt.Fprintf(&tableBuilder, rowFormat, key, formatValue(value))
+		}
+	}
+
+	return tableBuilder.String()
+}
+
+func formatValue(value interface{}) string {
+	if m, ok := value.(map[string]interface{}); ok {
+		pairs := make([]string, 0, len(m))
+		for k, v := range m {
+			if v != nil && v != "" {
+				pairs = append(pairs, fmt.Sprintf("%s: %v", k, v))
+			}
+		}
+		if len(pairs) > 0 {
+			return "[ " + strings.Join(pairs, ", ") + " ]"
+		}
+		return "[]"
+	}
+	return fmt.Sprintf("%v", value)
 }
 
 // ProcessAuthCredentials processes the authentication credentials from a string that can be either a JSON or a comma-separated list of key=value pairs

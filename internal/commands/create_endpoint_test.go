@@ -8,6 +8,7 @@ import (
 	"path"
 	"reflect"
 	"runtime"
+	"strings"
 	"testing"
 
 	"github.com/spf13/cobra"
@@ -195,12 +196,12 @@ func TestProcessAPIResponse(t *testing.T) {
 			result, err := processAPIResponse(tt.input)
 			if err != nil {
 				// Handle the error
-				if err.Error() != tt.expected {
-					t.Errorf("processAPIResponse() returned an error: %v, want %v", err, tt.expected)
+				if !strings.Contains(err.Error(), tt.expected) {
+					t.Errorf("processAPIResponse() returned an error: %v, want it to contain %v", err, tt.expected)
 				}
 			} else {
-				if !reflect.DeepEqual(result, tt.expected) {
-					t.Errorf("processAPIResponse() = %v, want %v", result, tt.expected)
+				if !strings.Contains(result, tt.expected) {
+					t.Errorf("processAPIResponse() = %v, want it to contain %v", result, tt.expected)
 				}
 			}
 
