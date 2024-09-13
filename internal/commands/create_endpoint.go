@@ -171,7 +171,7 @@ func processAPIResponse(resp *http.Response) (string, error) {
 	return fmt.Sprintf("Endpoint created successfully!\nMock URL: %s", createResponse.MockURL), nil
 }
 
-// New private function
+// ProcessAuthCredentials processes the authentication credentials from a string that can be either a JSON or a comma-separated list of key=value pairs
 func processAuthCredentials(authType, authProperties string) map[string]interface{} {
 	authCredentials := map[string]interface{}{
 		"type": authType,
