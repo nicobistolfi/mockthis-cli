@@ -182,7 +182,11 @@ func processAuthCredentials(authType, authProperties string) map[string]interfac
 
 	authPropertiesMap := make(map[string]interface{})
 	if utils.IsJSON(authProperties) {
-		json.Unmarshal([]byte(authProperties), &authPropertiesMap)
+		err := json.Unmarshal([]byte(authProperties), &authPropertiesMap)
+		if err != nil {
+			fmt.Println("Error unmarshalling JSON:", err)
+			os.Exit(1)
+		}
 	} else {
 		propertyPairs := strings.Split(authProperties, ",")
 
@@ -229,11 +233,12 @@ func loadFromFile(filePath string, cmd *cobra.Command) error {
 	var endpointData map[string]interface{}
 	ext := filepath.Ext(filePath)
 
-	if utils.IsJSON(data) {
+	switch {
+	case utils.IsJSON(data):
 		endpointData, err = utils.ParseJSON(data)
-	} else if utils.IsYAML(data) {
+	case utils.IsYAML(data):
 		endpointData, err = utils.ParseYAML(data)
-	} else {
+	default:
 		fmt.Printf("Unsupported file format: %s. Use JSON or YAML.\n", ext)
 		err = fmt.Errorf("unsupported file format: %s", ext)
 		return err

@@ -3,6 +3,7 @@ package utils
 import (
 	"encoding/json"
 	"fmt"
+	"os"
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
@@ -11,17 +12,22 @@ import (
 // MapToFlags sets values for existing flags in a cobra.Command
 func MapToFlags(data map[string]interface{}, cmd *cobra.Command) {
 	for key, value := range data {
+		var err error
 		switch v := value.(type) {
 		case map[string]interface{}:
 			handleNestedMap(key, v, cmd)
 		case string:
-			cmd.Flags().Set(key, v)
+			err = cmd.Flags().Set(key, v)
 		case int:
-			cmd.Flags().Set(key, fmt.Sprintf("%d", v))
+			err = cmd.Flags().Set(key, fmt.Sprintf("%d", v))
 		case float64:
-			cmd.Flags().Set(key, fmt.Sprintf("%f", v))
+			err = cmd.Flags().Set(key, fmt.Sprintf("%f", v))
 		case bool:
-			cmd.Flags().Set(key, fmt.Sprintf("%t", v))
+			err = cmd.Flags().Set(key, fmt.Sprintf("%t", v))
+		}
+		if err != nil {
+			fmt.Println("Error setting flag:", err)
+			os.Exit(1)
 		}
 	}
 
@@ -33,6 +39,7 @@ func MapToFlags(data map[string]interface{}, cmd *cobra.Command) {
 
 func handleNestedMap(prefix string, data map[string]interface{}, cmd *cobra.Command) {
 	for key, value := range data {
+		var err error
 		var fullKey string
 		if prefix == "response" {
 			fullKey = key
@@ -44,19 +51,23 @@ func handleNestedMap(prefix string, data map[string]interface{}, cmd *cobra.Comm
 			// Stringify nested map instead of recursing
 			jsonString, err := json.Marshal(v)
 			if err == nil {
-				cmd.Flags().Set(fullKey, string(jsonString))
+				err = cmd.Flags().Set(fullKey, string(jsonString))
 			}
 		case string:
-			cmd.Flags().Set(fullKey, v)
+			err = cmd.Flags().Set(fullKey, v)
 		case int:
-			cmd.Flags().Set(fullKey, fmt.Sprintf("%d", v))
+			err = cmd.Flags().Set(fullKey, fmt.Sprintf("%d", v))
 		case float64:
-			cmd.Flags().Set(fullKey, fmt.Sprintf("%f", v))
+			err = cmd.Flags().Set(fullKey, fmt.Sprintf("%f", v))
 		case bool:
-			cmd.Flags().Set(fullKey, fmt.Sprintf("%t", v))
+			err = cmd.Flags().Set(fullKey, fmt.Sprintf("%t", v))
 		default:
 			// Handle other types by converting to string
-			cmd.Flags().Set(fullKey, fmt.Sprintf("%v", v))
+			err = cmd.Flags().Set(fullKey, fmt.Sprintf("%v", v))
+		}
+		if err != nil {
+			fmt.Println("Error setting flag:", err)
+			os.Exit(1)
 		}
 	}
 }
