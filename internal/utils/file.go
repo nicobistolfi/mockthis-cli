@@ -27,7 +27,10 @@ func WriteFile(path string, content string) error {
 	// make directory if not exists
 	dir := filepath.Dir(path)
 	if _, err := os.Stat(dir); os.IsNotExist(err) {
-		os.MkdirAll(dir, 0755)
+		err = os.MkdirAll(dir, 0755)
+		if err != nil {
+			return err
+		}
 	}
 	return os.WriteFile(path, []byte(content), 0644)
 }

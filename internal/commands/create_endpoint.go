@@ -68,7 +68,10 @@ func parseCommandArguments(cmd *cobra.Command) (map[string]interface{}, error) {
 
 	filePath, _ := cmd.Flags().GetString("file")
 	if filePath != "" {
-		loadFromFile(filePath, cmd)
+		err := loadFromFile(filePath, cmd)
+		if err != nil {
+			return nil, err
+		}
 	}
 	endpointData = loadFromFlags(cmd)
 
