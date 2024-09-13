@@ -11,32 +11,40 @@ import (
 	"strings"
 
 	"github.com/nicobistolfi/mockthis-cli/internal/config"
+	"github.com/nicobistolfi/mockthis-cli/internal/utils"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
 	"golang.org/x/text/cases"
 	"golang.org/x/text/language"
-	yaml "gopkg.in/yaml.v2"
 )
 
 // CreateEndpointCmd is the command to create a new mock endpoint
 var CreateEndpointCmd = &cobra.Command{
-	Use:   "create [--file <path>] [--method <method>] [--http-status <code>] [--content-type <type>] [--charset <charset>] [--body <body>] [--auth-type <type>] [--auth-properties <properties>]",
+	Use:   "create [--file <path>] [--auth-type <type>] [--auth-properties <properties>] [--request-content-type <type>] [--request-schema <schema>] [--method <method>] [--http-status <status>] [--content-type <type>] [--charset <charset>] [--headers <headers>] [--schema <schema>] [--body <body>]",
 	Short: "Create a new mock endpoint",
 	Run:   createEndpoint,
 }
 
 func init() {
+	// File
 	CreateEndpointCmd.Flags().StringP("file", "f", "", "Path to JSON or YAML file containing endpoint data")
+
+	// Response
 	CreateEndpointCmd.Flags().String("method", "GET", "HTTP method (GET, POST, PUT, DELETE, etc.)")
 	CreateEndpointCmd.Flags().String("http-status", "200", "HTTP status code")
 	CreateEndpointCmd.Flags().String("content-type", "application/json", "Response Content-Type")
-	CreateEndpointCmd.Flags().String("request-content-type", "application/json", "Request Content-Type")
 	CreateEndpointCmd.Flags().String("charset", "UTF-8", "Charset")
+	CreateEndpointCmd.Flags().String("headers", "", "Response headers (comma-separated key=value pairs)")
+	CreateEndpointCmd.Flags().String("schema", "", "JSON Schema to validate the response body")
 	CreateEndpointCmd.Flags().String("body", "Hello, World! 🌎", "Response body")
-	CreateEndpointCmd.Flags().String("response-body-schema", "", "JSON Schema to validate the response body")
-	CreateEndpointCmd.Flags().String("request-body-schema", "", "JSON Schema to validate the request body")
+
+	// Authentication
 	CreateEndpointCmd.Flags().String("auth-type", "", "Authentication type (basic, api-key, bearer-token, oauth2, jwt)")
 	CreateEndpointCmd.Flags().String("auth-properties", "", "Authentication properties (comma-separated key=value pairs)")
+
+	// Request
+	CreateEndpointCmd.Flags().String("request-content-type", "application/json", "Request Content-Type")
+	CreateEndpointCmd.Flags().String("request-schema", "", "JSON Schema to validate the request body")
 }
 
 func createEndpoint(cmd *cobra.Command, args []string) {
@@ -60,11 +68,14 @@ func parseCommandArguments(cmd *cobra.Command) (map[string]interface{}, error) {
 
 	filePath, _ := cmd.Flags().GetString("file")
 	if filePath != "" {
-		endpointData = loadFromFile(filePath)
-	} else {
-		endpointData = loadFromFlags(cmd)
+		err := loadFromFile(filePath, cmd)
+		if err != nil {
+			return nil, err
+		}
 	}
+	endpointData = loadFromFlags(cmd)
 
+	fmt.Println(endpointData)
 	// Convert httpStatus to int
 	if httpStatus, ok := endpointData["httpStatus"].(string); ok {
 		endpointData["httpStatus"], _ = strconv.Atoi(httpStatus)
@@ -163,19 +174,27 @@ func processAPIResponse(resp *http.Response) (string, error) {
 	return fmt.Sprintf("Endpoint created successfully!\nMock URL: %s", createResponse.MockURL), nil
 }
 
-// New private function
+// ProcessAuthCredentials processes the authentication credentials from a string that can be either a JSON or a comma-separated list of key=value pairs
 func processAuthCredentials(authType, authProperties string) map[string]interface{} {
 	authCredentials := map[string]interface{}{
 		"type": authType,
 	}
 
 	authPropertiesMap := make(map[string]interface{})
-	propertyPairs := strings.Split(authProperties, ",")
+	if utils.IsJSON(authProperties) {
+		err := json.Unmarshal([]byte(authProperties), &authPropertiesMap)
+		if err != nil {
+			fmt.Println("Error unmarshalling JSON:", err)
+			os.Exit(1)
+		}
+	} else {
+		propertyPairs := strings.Split(authProperties, ",")
 
-	for _, pair := range propertyPairs {
-		parts := strings.Split(pair, "=")
-		if len(parts) == 2 {
-			authPropertiesMap[strings.TrimSpace(parts[0])] = strings.TrimSpace(parts[1])
+		for _, pair := range propertyPairs {
+			parts := strings.Split(pair, "=")
+			if len(parts) == 2 {
+				authPropertiesMap[strings.TrimSpace(parts[0])] = strings.TrimSpace(parts[1])
+			}
 		}
 	}
 
@@ -204,29 +223,34 @@ func processAuthCredentials(authType, authProperties string) map[string]interfac
 	return authCredentials
 }
 
-func loadFromFile(filePath string) map[string]interface{} {
-	data, err := os.ReadFile(filePath)
+func loadFromFile(filePath string, cmd *cobra.Command) error {
+	data, err := utils.LoadFile(filePath)
 	if err != nil {
 		fmt.Printf("Error reading file: %v\n", err)
-		os.Exit(1)
+		return err
 	}
 
 	var endpointData map[string]interface{}
-	if ext := filepath.Ext(filePath); ext == ".json" {
-		err = json.Unmarshal(data, &endpointData)
-	} else if ext == ".yaml" || ext == ".yml" {
-		err = yaml.Unmarshal(data, &endpointData)
-	} else {
-		fmt.Println("Unsupported file format. Use JSON or YAML.")
-		os.Exit(1)
+	ext := filepath.Ext(filePath)
+
+	switch {
+	case utils.IsJSON(data):
+		endpointData, err = utils.ParseJSON(data)
+	case utils.IsYAML(data):
+		endpointData, err = utils.ParseYAML(data)
+	default:
+		fmt.Printf("Unsupported file format: %s. Use JSON or YAML.\n", ext)
+		err = fmt.Errorf("unsupported file format: %s", ext)
+		return err
 	}
 
 	if err != nil {
 		fmt.Printf("Error parsing file: %v\n", err)
-		os.Exit(1)
+		return err
 	}
 
-	return endpointData
+	utils.MapToFlags(endpointData["endpoint"].(map[string]interface{}), cmd)
+	return nil
 }
 
 func loadFromFlags(cmd *cobra.Command) map[string]interface{} {
@@ -237,6 +261,8 @@ func loadFromFlags(cmd *cobra.Command) map[string]interface{} {
 		"body":                 "responseBody",
 		"content-type":         "responseContentType",
 		"request-content-type": "requestContentType",
+		"schema":               "responseBodySchema",
+		"request-schema":       "requestBodySchema",
 	}
 
 	cmd.Flags().VisitAll(func(flag *pflag.Flag) {
