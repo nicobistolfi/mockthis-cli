@@ -266,11 +266,11 @@ func processAuthCredentials(authType, authProperties string) map[string]interfac
 	case "basic":
 		authCredentials["username"] = authPropertiesMap["username"]
 		authCredentials["password"] = authPropertiesMap["password"]
-	case "api-key":
+	case "apiKey":
 		authCredentials["name"] = authPropertiesMap["name"]
 		authCredentials["value"] = authPropertiesMap["value"]
 		authCredentials["in"] = authPropertiesMap["in"]
-	case "bearer-token":
+	case "bearer":
 		authCredentials["token"] = authPropertiesMap["token"]
 	case "oauth2":
 		authCredentials["accessToken"] = authPropertiesMap["accessToken"]
@@ -313,7 +313,13 @@ func loadFromFile(filePath string, cmd *cobra.Command) error {
 		return err
 	}
 
-	utils.MapToFlags(endpointData["endpoint"].(map[string]interface{}), cmd)
+	// Check if "endpoint" key exists and is a map
+	endpoint, ok := endpointData["endpoint"].(map[string]interface{})
+	if !ok {
+		return fmt.Errorf("endpoint data is not a map or the endpoint key is not found")
+	}
+
+	utils.MapToFlags(endpoint, cmd)
 	return nil
 }
 

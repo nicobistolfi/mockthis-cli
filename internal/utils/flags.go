@@ -30,7 +30,7 @@ func MapToFlags(data map[string]interface{}, cmd *cobra.Command) {
 		}
 	}
 
-	// Print the flags
+	//Print the flags
 	// cmd.Flags().VisitAll(func(flag *pflag.Flag) {
 	// 	fmt.Printf("Flag: %s=%s\n", flag.Name, flag.Value)
 	// })

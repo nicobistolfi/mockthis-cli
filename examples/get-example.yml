@@ -1,15 +1,16 @@
 # GET example
-response:
-  method: GET
-  http-status: 200
-  content-type: application/json
-  charset: UTF-8
-  headers:
-    X-Example-Header: GET Example
-  schema:
-    type: object
-  body: |
-    {
-      "message": "This is a GET response",
-      "timestamp": "2024-09-13T12:00:00Z"
-    }
+endpoint:
+  response:
+    method: GET
+    http-status: 200
+    content-type: application/json
+    charset: UTF-8
+    headers:
+      X-Example-Header: GET Example
+    schema:
+      type: object
+    body: |
+      {
+        "message": "This is a GET response",
+        "timestamp": "2024-09-13T12:00:00Z"
+      }

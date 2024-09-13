@@ -1,19 +1,20 @@
 # GET with JWT authentication
-auth:
-  type: jwt
-  properties:
-    token: your-jwt-token-here
-response:
-  method: GET
-  http-status: 200
-  content-type: application/json
-  charset: UTF-8
-  headers:
-    X-Example-Header: GET with JWT Example
-  schema:
-    type: object
-  body: |
-    {
-      "message": "Authenticated with JWT",
-      "timestamp": "2024-09-13T12:07:00Z"
-    }
+endpoint:
+  auth:
+    type: jwt
+    properties:
+      token: your-jwt-token-here
+  response:
+    method: GET
+    http-status: 200
+    content-type: application/json
+    charset: UTF-8
+    headers:
+      X-Example-Header: GET with JWT Example
+    schema:
+      type: object
+    body: |
+      {
+        "message": "Authenticated with JWT",
+        "timestamp": "2024-09-13T12:07:00Z"
+      }
