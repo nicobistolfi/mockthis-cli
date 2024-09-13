@@ -2,13 +2,16 @@ package commands
 
 import (
 	"bytes"
+	"fmt"
 	"io"
 	"net/http"
-	"os"
+	"path"
 	"reflect"
+	"runtime"
 	"testing"
 
 	"github.com/spf13/cobra"
+	"github.com/spf13/pflag"
 )
 
 func TestProcessAuthCredentials(t *testing.T) {
@@ -55,77 +58,6 @@ func TestProcessAuthCredentials(t *testing.T) {
 			result := processAuthCredentials(tt.authType, tt.authProperties)
 			if !reflect.DeepEqual(result, tt.expected) {
 				t.Errorf("processAuthCredentials() = %v, want %v", result, tt.expected)
-			}
-		})
-	}
-}
-
-func TestLoadFromFile(t *testing.T) {
-	// Create a temporary JSON file
-	jsonContent := `{"method": "POST", "httpStatus": 201, "responseContentType": "application/json"}`
-	jsonFile, err := os.CreateTemp("", "test*.json")
-	if err != nil {
-		t.Fatal(err)
-	}
-	defer os.Remove(jsonFile.Name())
-
-	_, err = jsonFile.Write([]byte(jsonContent))
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	err = jsonFile.Close()
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	// Create a temporary YAML file
-	yamlContent := "method: GET\nhttpStatus: 200\nresponseContentType: text/plain"
-	yamlFile, err := os.CreateTemp("", "test*.yaml")
-	if err != nil {
-		t.Fatal(err)
-	}
-	defer os.Remove(yamlFile.Name())
-	_, err = yamlFile.Write([]byte(yamlContent))
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	err = yamlFile.Close()
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	tests := []struct {
-		name     string
-		filePath string
-		expected map[string]interface{}
-	}{
-		{
-			name:     "JSON File",
-			filePath: jsonFile.Name(),
-			expected: map[string]interface{}{
-				"method":              "POST",
-				"httpStatus":          float64(201),
-				"responseContentType": "application/json",
-			},
-		},
-		{
-			name:     "YAML File",
-			filePath: yamlFile.Name(),
-			expected: map[string]interface{}{
-				"method":              "GET",
-				"httpStatus":          200,
-				"responseContentType": "text/plain",
-			},
-		},
-	}
-
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			result := loadFromFile(tt.filePath)
-			if !reflect.DeepEqual(result, tt.expected) {
-				t.Errorf("loadFromFile() = %v, want %v", result, tt.expected)
 			}
 		})
 	}
@@ -272,6 +204,87 @@ func TestProcessAPIResponse(t *testing.T) {
 				}
 			}
 
+		})
+	}
+}
+
+func TestLoadFromFile(t *testing.T) {
+	// Get the directory of the current file
+	_, filename, _, _ := runtime.Caller(0)
+	currentDir := path.Dir(filename)
+	testDataDir := path.Join(currentDir, "..", "..", "tests/data")
+
+	tests := []struct {
+		name     string
+		filePath string
+		wantErr  bool
+		expected map[string]string
+	}{
+		{
+			name:     "Valid JSON file",
+			filePath: path.Join(testDataDir, "valid.json"),
+			wantErr:  false,
+			expected: map[string]string{
+				"method":       "POST",
+				"http-status":  "201",
+				"content-type": "application/json",
+				"body":         `{"message":"Created"}`,
+			},
+		},
+		{
+			name:     "Valid YAML file",
+			filePath: path.Join(testDataDir, "valid.yaml"),
+			wantErr:  false,
+			expected: map[string]string{
+				"method":       "GET",
+				"http-status":  "200",
+				"content-type": "text/plain",
+				"body":         "Hello, World!",
+			},
+		},
+		{
+			name:     "Invalid file format",
+			filePath: path.Join(testDataDir, "invalid.txt"),
+			wantErr:  true,
+			expected: nil,
+		},
+		{
+			name:     "Non-existent file",
+			filePath: path.Join(testDataDir, "nonexistent.json"),
+			wantErr:  true,
+			expected: nil,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			cmd := &cobra.Command{}
+			CreateEndpointCmd.Flags().VisitAll(func(flag *pflag.Flag) {
+				cmd.Flags().AddFlag(flag)
+			})
+
+			fmt.Println("file path", tt.filePath)
+
+			err := loadFromFile(tt.filePath, cmd)
+			fmt.Println("error", err)
+
+			if (err != nil) != tt.wantErr {
+				t.Errorf("loadFromFile() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+
+			if !tt.wantErr {
+				for key, expectedValue := range tt.expected {
+					flag := cmd.Flags().Lookup(key)
+					if flag == nil {
+						t.Errorf("Flag %s not found", key)
+						continue
+					}
+					if flag.Value.String() != expectedValue {
+						t.Errorf("Flag %s = %v, want %v", key, flag.Value.String(), expectedValue)
+					}
+				}
+			}
 		})
 	}
 }

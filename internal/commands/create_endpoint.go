@@ -232,6 +232,7 @@ func loadFromFile(filePath string, cmd *cobra.Command) error {
 		endpointData, err = utils.ParseYAML(data)
 	} else {
 		fmt.Printf("Unsupported file format: %s. Use JSON or YAML.\n", ext)
+		err = fmt.Errorf("unsupported file format: %s", ext)
 		return err
 	}
 

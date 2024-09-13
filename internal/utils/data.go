@@ -22,12 +22,20 @@ func ParseJSON(data string) (map[string]interface{}, error) {
 	if !IsJSON(data) {
 		return nil, errors.New("data is not a valid JSON")
 	}
-	var result map[interface{}]interface{}
+	var result map[string]interface{}
 	err := json.Unmarshal([]byte(data), &result)
 	if err != nil {
 		return nil, err
 	}
-	return convertMap(result), nil
+
+	// Convert to map[interface{}]interface{}
+	converted := make(map[interface{}]interface{})
+
+	for k, v := range result {
+		converted[k] = v
+	}
+
+	return convertMap(converted), nil
 }
 
 func ParseYAML(data string) (map[string]interface{}, error) {
