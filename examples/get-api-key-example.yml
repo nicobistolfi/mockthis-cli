@@ -1,0 +1,22 @@
+# GET with API Key authentication
+endpoint:
+  auth:
+    type: apiKey
+    properties:
+      name: X-API-Key
+      value: your-api-key-here
+      in: header
+  response:
+    method: GET
+    http-status: 200
+    content-type: application/json
+    charset: UTF-8
+    headers:
+      X-Example-Header: GET with API Key Example
+    schema:
+      type: object
+    body: |
+      {
+        "message": "Authenticated with API Key",
+        "timestamp": "2024-09-13T12:04:00Z"
+      }

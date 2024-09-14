@@ -39,7 +39,7 @@ func init() {
 	CreateEndpointCmd.Flags().String("body", "Hello, World! 🌎", "Response body")
 
 	// Authentication
-	CreateEndpointCmd.Flags().String("auth-type", "", "Authentication type (basic, api-key, bearer-token, oauth2, jwt)")
+	CreateEndpointCmd.Flags().String("auth-type", "", "Authentication type (basic, apiKey, bearer, oauth2, jwt)")
 	CreateEndpointCmd.Flags().String("auth-properties", "", "Authentication properties (comma-separated key=value pairs)")
 
 	// Request
@@ -75,7 +75,6 @@ func parseCommandArguments(cmd *cobra.Command) (map[string]interface{}, error) {
 	}
 	endpointData = loadFromFlags(cmd)
 
-	fmt.Println(endpointData)
 	// Convert httpStatus to int
 	if httpStatus, ok := endpointData["httpStatus"].(string); ok {
 		endpointData["httpStatus"], _ = strconv.Atoi(httpStatus)
@@ -113,7 +112,7 @@ func parseCommandArguments(cmd *cobra.Command) (map[string]interface{}, error) {
 	if responseBody, ok := endpointData["responseBody"].(string); ok {
 		endpointData["responseBody"] = responseBody
 	} else {
-		return nil, fmt.Errorf("responseBody is not a string or is missing")
+		endpointData["responseBody"] = nil
 	}
 
 	for _, field := range []string{"responseBodySchema", "requestContentType", "requestBodySchema"} {
@@ -164,14 +163,79 @@ func processAPIResponse(resp *http.Response) (string, error) {
 	}
 
 	var createResponse struct {
-		MockURL string `json:"mockUrl"`
+		MockURL  string                 `json:"mockUrl"`
+		ID       string                 `json:"id"`
+		Endpoint map[string]interface{} `json:"endpoint"`
 	}
 	err := json.NewDecoder(resp.Body).Decode(&createResponse)
 	if err != nil {
 		return "", fmt.Errorf("error decoding API response: %v", err)
 	}
 
-	return fmt.Sprintf("Endpoint created successfully!\nMock URL: %s", createResponse.MockURL), nil
+	table := buildTableFromMap(createResponse.Endpoint)
+
+	return fmt.Sprintf("Endpoint created successfully!\nMock URL: %s\n\n%s", createResponse.MockURL, table), nil
+}
+
+// Print a table from a map and keep it aligned to the left
+func buildTableFromMap(data map[string]interface{}) string {
+	// Define the order of keys
+	order := []string{"ID", "Method", "HTTPStatus", "ResponseContentType", "ResponseBody"}
+
+	// Find the maximum width for each column
+	maxKeyWidth := 5   // minimum width for "Field"
+	maxValueWidth := 5 // minimum width for "Value"
+	for key, value := range data {
+		keyWidth := len(key)
+		valueWidth := len(fmt.Sprintf("%v", value))
+		if keyWidth > maxKeyWidth {
+			maxKeyWidth = keyWidth
+		}
+		if valueWidth > maxValueWidth {
+			maxValueWidth = valueWidth
+		}
+	}
+
+	// Create the format string for each row
+	rowFormat := fmt.Sprintf("| %%-%ds | %%-%ds |\n", maxKeyWidth, maxValueWidth)
+
+	// Build the table
+	var tableBuilder strings.Builder
+	tableBuilder.WriteString(fmt.Sprintf(rowFormat, "Field", "Value"))
+	tableBuilder.WriteString(fmt.Sprintf("+%s+%s+\n", strings.Repeat("-", maxKeyWidth+2), strings.Repeat("-", maxValueWidth+2)))
+
+	// First, add rows for ordered keys
+	for _, key := range order {
+		if value, exists := data[key]; exists && value != nil && value != "" {
+			fmt.Fprintf(&tableBuilder, rowFormat, key, formatValue(value))
+			delete(data, key)
+		}
+	}
+
+	// Then, add rows for remaining keys
+	for key, value := range data {
+		if value != nil && value != "" {
+			fmt.Fprintf(&tableBuilder, rowFormat, key, formatValue(value))
+		}
+	}
+
+	return tableBuilder.String()
+}
+
+func formatValue(value interface{}) string {
+	if m, ok := value.(map[string]interface{}); ok {
+		pairs := make([]string, 0, len(m))
+		for k, v := range m {
+			if v != nil && v != "" {
+				pairs = append(pairs, fmt.Sprintf("%s: %v", k, v))
+			}
+		}
+		if len(pairs) > 0 {
+			return "[ " + strings.Join(pairs, ", ") + " ]"
+		}
+		return "[]"
+	}
+	return fmt.Sprintf("%v", value)
 }
 
 // ProcessAuthCredentials processes the authentication credentials from a string that can be either a JSON or a comma-separated list of key=value pairs
@@ -202,11 +266,11 @@ func processAuthCredentials(authType, authProperties string) map[string]interfac
 	case "basic":
 		authCredentials["username"] = authPropertiesMap["username"]
 		authCredentials["password"] = authPropertiesMap["password"]
-	case "api-key":
+	case "apiKey":
 		authCredentials["name"] = authPropertiesMap["name"]
 		authCredentials["value"] = authPropertiesMap["value"]
 		authCredentials["in"] = authPropertiesMap["in"]
-	case "bearer-token":
+	case "bearer":
 		authCredentials["token"] = authPropertiesMap["token"]
 	case "oauth2":
 		authCredentials["accessToken"] = authPropertiesMap["accessToken"]
@@ -216,7 +280,7 @@ func processAuthCredentials(authType, authProperties string) map[string]interfac
 	case "jwt":
 		authCredentials["token"] = authPropertiesMap["token"]
 	default:
-		fmt.Println("Invalid authentication type. Supported types: basic, api-key, bearer-token, oauth2, jwt")
+		fmt.Println("Invalid authentication type. Supported types: basic, apikey, bearer, oauth2, jwt. Got:", authType)
 		os.Exit(1)
 	}
 
@@ -249,7 +313,13 @@ func loadFromFile(filePath string, cmd *cobra.Command) error {
 		return err
 	}
 
-	utils.MapToFlags(endpointData["endpoint"].(map[string]interface{}), cmd)
+	// Check if "endpoint" key exists and is a map
+	endpoint, ok := endpointData["endpoint"].(map[string]interface{})
+	if !ok {
+		return fmt.Errorf("endpoint data is not a map or the endpoint key is not found")
+	}
+
+	utils.MapToFlags(endpoint, cmd)
 	return nil
 }
 

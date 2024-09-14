@@ -1,0 +1,7 @@
+# DELETE example
+endpoint:
+  response:
+    method: DELETE
+    http-status: 204
+    headers:
+      X-Example-Header: DELETE Example

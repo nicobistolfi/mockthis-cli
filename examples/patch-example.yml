@@ -1,0 +1,24 @@
+# PATCH example
+endpoint:
+  response:
+    method: PATCH
+    http-status: 200
+    content-type: application/json
+    charset: UTF-8
+    headers:
+      X-Example-Header: PATCH Example
+    schema:
+      type: object
+    body: |
+      {
+        "id": "123456",
+        "message": "Resource updated successfully",
+        "timestamp": "2024-09-13T12:02:00Z"
+      }
+  request:
+    content-type: application/json
+    schema:
+      type: object
+      properties:
+        email:
+          type: string

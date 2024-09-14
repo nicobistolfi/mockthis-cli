@@ -1,0 +1,26 @@
+# POST example
+endpoint:
+  response:
+    method: POST
+    http-status: 201
+    content-type: application/json
+    charset: UTF-8
+    headers:
+      X-Example-Header: POST Example
+    schema:
+      type: object
+    body: |
+      {
+        "id": "123456",
+        "message": "Resource created successfully",
+        "timestamp": "2024-09-13T12:01:00Z"
+      }
+  request:
+    content-type: application/json
+    schema:
+      type: object
+      properties:
+        name:
+          type: string
+        email:
+          type: string

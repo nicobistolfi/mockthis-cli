@@ -2,12 +2,12 @@ package commands
 
 import (
 	"bytes"
-	"fmt"
 	"io"
 	"net/http"
 	"path"
 	"reflect"
 	"runtime"
+	"strings"
 	"testing"
 
 	"github.com/spf13/cobra"
@@ -33,10 +33,10 @@ func TestProcessAuthCredentials(t *testing.T) {
 		},
 		{
 			name:           "API Key",
-			authType:       "api-key",
+			authType:       "apiKey",
 			authProperties: "name=api_key,value=12345,in=header",
 			expected: map[string]interface{}{
-				"type":  "api-key",
+				"type":  "apiKey",
 				"name":  "api_key",
 				"value": "12345",
 				"in":    "header",
@@ -44,10 +44,10 @@ func TestProcessAuthCredentials(t *testing.T) {
 		},
 		{
 			name:           "Bearer Token",
-			authType:       "bearer-token",
+			authType:       "bearer",
 			authProperties: "token=abcdef123456",
 			expected: map[string]interface{}{
-				"type":  "bearer-token",
+				"type":  "bearer",
 				"token": "abcdef123456",
 			},
 		},
@@ -195,12 +195,12 @@ func TestProcessAPIResponse(t *testing.T) {
 			result, err := processAPIResponse(tt.input)
 			if err != nil {
 				// Handle the error
-				if err.Error() != tt.expected {
-					t.Errorf("processAPIResponse() returned an error: %v, want %v", err, tt.expected)
+				if !strings.Contains(err.Error(), tt.expected) {
+					t.Errorf("processAPIResponse() returned an error: %v, want it to contain %v", err, tt.expected)
 				}
 			} else {
-				if !reflect.DeepEqual(result, tt.expected) {
-					t.Errorf("processAPIResponse() = %v, want %v", result, tt.expected)
+				if !strings.Contains(result, tt.expected) {
+					t.Errorf("processAPIResponse() = %v, want it to contain %v", result, tt.expected)
 				}
 			}
 
@@ -263,11 +263,7 @@ func TestLoadFromFile(t *testing.T) {
 				cmd.Flags().AddFlag(flag)
 			})
 
-			fmt.Println("file path", tt.filePath)
-
 			err := loadFromFile(tt.filePath, cmd)
-			fmt.Println("error", err)
-
 			if (err != nil) != tt.wantErr {
 				t.Errorf("loadFromFile() error = %v, wantErr %v", err, tt.wantErr)
 				return

@@ -1,0 +1,23 @@
+# GET with OAuth2 authentication
+endpoint:
+  auth:
+    type: oauth2
+    properties:
+      accessToken: your-access-token-here
+      tokenType: Bearer
+      expiresIn: 3600
+      refreshToken: your-refresh-token-here
+  response:
+    method: GET
+    http-status: 200
+    content-type: application/json
+    charset: UTF-8
+    headers:
+      X-Example-Header: GET with OAuth2 Example
+    schema:
+      type: object
+    body: |
+      {
+        "message": "Authenticated with OAuth2",
+        "timestamp": "2024-09-13T12:06:00Z"
+      }
