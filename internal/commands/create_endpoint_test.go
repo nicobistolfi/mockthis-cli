@@ -166,9 +166,9 @@ func TestProcessAPIResponse(t *testing.T) {
 				StatusCode: 200,
 				Status:     "200 OK",
 				Header:     http.Header{"Content-Type": []string{"application/json"}},
-				Body:       io.NopCloser(bytes.NewBufferString(`{"MockURL": "https://dev.api.mockthis.io/api/v1/endpoint/1234567890"}`)),
+				Body:       io.NopCloser(bytes.NewBufferString(`{"MockURL": "https://dev.api.mockthis.io/api/v1/endpoints/1234567890"}`)),
 			},
-			expected: "Endpoint created successfully!\nMock URL: https://dev.api.mockthis.io/api/v1/endpoint/1234567890",
+			expected: "Endpoint created successfully!\nMock URL: https://dev.api.mockthis.io/api/v1/endpoints/1234567890",
 		},
 		{
 			name: "Unauthorized",
