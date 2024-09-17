@@ -41,7 +41,7 @@ func login(cmd *cobra.Command, args []string) {
 	defer resp.Body.Close()
 
 	if resp.StatusCode != http.StatusOK {
-		fmt.Println("Login failed.\nIf you don't have an account, please sign by running `mt register`")
+		fmt.Println("Login failed.\nIf you don't have an account, please sign by running `mockthis register`")
 		return
 	}
 
