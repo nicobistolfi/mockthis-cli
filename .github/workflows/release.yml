@@ -24,11 +24,11 @@ jobs:
         uses: actions/setup-go@v5
         with:
           go-version: stable
-      - name: Install gon
-        run: |
-          wget https://github.com/mitchellh/gon/releases/download/v0.2.3/gon_0.2.3_linux_amd64.tar.gz
-          tar -xzf gon_0.2.3_linux_amd64.tar.gz
-          sudo mv gon /usr/local/bin/gon
+      # - name: Install gon
+      #   run: |
+      #     wget https://github.com/mitchellh/gon/releases/download/v0.2.3/gon_0.2.3_linux_amd64.tar.gz
+      #     tar -xzf gon_0.2.3_linux_amd64.tar.gz
+      #     sudo mv gon /usr/local/bin/gon
       - name: Run GoReleaser
         uses: goreleaser/goreleaser-action@v6
         with:
