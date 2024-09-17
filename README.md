@@ -75,18 +75,22 @@ If you don't provide an email, you will be prompted to enter it.
 To create a new mock endpoint, use the create command. You can provide the endpoint details as arguments or enter them when prompted.
 
 ```
-mockthis create --method GET --status 200 --body '{"message": "Hello, World!"}'
+mockthis create -m GET -s 200 -b '{"message": "Hello, World!"}'
 ```
 Comand line output will include the endpoint details, such as the method, status, body, and path.
 
 ```
 Endpoint created successfully!
+Mock URL: https://api.mockthis.io/m/c35f0f6-af9d-4976-8ff9-d45e1dee8832
 
-Endpoint ID: 1234567890
-Endpoint Method: GET
-Endpoint Status: 200
-Endpoint Body: {"message": "Hello, World!"}
-
-Endpoint URL: https://api.mockthis.io/m/abad312-das-3231nmd
+| Field               | Value                                |
++---------------------+--------------------------------------+
+| ID                  | c35f0f6-af9d-4976-8ff9-d45e1dee8832  |
+| Method              | GET                                  |
+| HTTPStatus          | 200                                  |
+| ResponseContentType | application/json                     |
+| ResponseBody        | {"message": "Hello, World!"}         |
+| CreatedAt           | 2024-09-17T02:29:45Z                 |
+| Charset             | UTF-8                                |
 ```
 
