@@ -2,6 +2,7 @@
 
 [![Go Reference](https://pkg.go.dev/badge/github.com/nicobistolfi/mockthis-cli.svg)](https://pkg.go.dev/github.com/nicobistolfi/mockthis-cli)
 [![Go Report Card](https://goreportcard.com/badge/github.com/nicobistolfi/mockthis-cli)](https://goreportcard.com/report/github.com/nicobistolfi/mockthis-cli)
+![Build And Test](https://github.com/nicobistolfi/mockthis-cli/actions/workflows/go.yml/badge.svg)
 [![Documentation](https://img.shields.io/badge/documentation-yes-blue.svg)](https://docs.mockthis.io/)
 ![License](https://img.shields.io/badge/license-MIT-green.svg)
 [![Author](https://img.shields.io/badge/author-%40nicobistolfi-blue.svg)](https://github.com/nicobistolfi)
@@ -44,7 +45,6 @@ mockthis [command] [flags]
 ### Available Commands
 
 - `create`: Create a new mock endpoint
-- `update`: Modify an existing endpoint
 - `delete`: Remove an endpoint
 - `list`: Display all created endpoints
 - `get`: Retrieve details of a specific endpoint
