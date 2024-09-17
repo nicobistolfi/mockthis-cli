@@ -8,6 +8,7 @@ brews:
     description: Mock API endpoints for testing and development.
     license: MIT
     install: go install ./cmd/mockthis
+    directory: Formula
     repository:
       owner: nicobistolfi
       name: homebrew-carbon
