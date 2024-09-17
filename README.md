@@ -1,5 +1,11 @@
 # MockThis CLI
 
+[![Go Reference](https://pkg.go.dev/badge/github.com/nicobistolfi/mockthis-cli.svg)](https://pkg.go.dev/github.com/nicobistolfi/mockthis-cli)
+[![Go Report Card](https://goreportcard.com/badge/github.com/nicobistolfi/mockthis-cli)](https://goreportcard.com/report/github.com/nicobistolfi/mockthis-cli)
+[![Documentation](https://img.shields.io/badge/documentation-yes-blue.svg)](https://docs.mockthis.io/)
+![License](https://img.shields.io/badge/license-MIT-green.svg)
+[![Author](https://img.shields.io/badge/author-%40nicobistolfi-blue.svg)](https://github.com/nicobistolfi)
+
 MockThis is a command-line interface (CLI) tool for managing mock API endpoints. It allows users to create, update, delete, and list mock endpoints for testing and development purposes.
 
 ## Installation
