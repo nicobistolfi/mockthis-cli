@@ -6,6 +6,9 @@
 ![License](https://img.shields.io/badge/license-MIT-green.svg)
 [![Author](https://img.shields.io/badge/author-%40nicobistolfi-blue.svg)](https://github.com/nicobistolfi)
 
+![Build And Test](https://github.com/nicobistolfi/mockthis-cli/actions/workflows/go.yml/badge.svg)
+![Release](https://github.com/nicobistolfi/mockthis-cli/actions/workflows/release.yml/badge.svg)
+
 MockThis is a command-line interface (CLI) tool for managing mock API endpoints. It allows users to create, update, delete, and list mock endpoints for testing and development purposes.
 
 ## Installation
@@ -44,7 +47,6 @@ mockthis [command] [flags]
 ### Available Commands
 
 - `create`: Create a new mock endpoint
-- `update`: Modify an existing endpoint
 - `delete`: Remove an endpoint
 - `list`: Display all created endpoints
 - `get`: Retrieve details of a specific endpoint
