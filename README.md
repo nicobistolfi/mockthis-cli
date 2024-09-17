@@ -6,8 +6,6 @@
 ![License](https://img.shields.io/badge/license-MIT-green.svg)
 [![Author](https://img.shields.io/badge/author-%40nicobistolfi-blue.svg)](https://github.com/nicobistolfi)
 
-GitHub Actions
-
 ![Build And Test](https://github.com/nicobistolfi/mockthis-cli/actions/workflows/go.yml/badge.svg)
 ![Release](https://github.com/nicobistolfi/mockthis-cli/actions/workflows/release.yml/badge.svg)
 
