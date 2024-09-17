@@ -12,6 +12,7 @@ brews:
       owner: nicobistolfi
       name: homebrew-carbon
       branch: main
+      token: "{{ .Env.HOMEBREW_GITHUB_API_TOKEN }}"
     commit_author:
       name: nicobistolfi
       email: git@bistol.fi
