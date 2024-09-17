@@ -26,7 +26,7 @@ brews:
     homepage: https://mockthis.io
     description: Mock API endpoints for testing and development.
     license: MIT
-    install: go install ./cmd/mockthis
+    install: bin.install "mockthis"
     directory: Formula
     repository:
       owner: nicobistolfi
@@ -36,3 +36,5 @@ brews:
     commit_author:
       name: nicobistolfi
       email: git@bistol.fi
+    test: |
+      system "#{bin}/mockthis version"
