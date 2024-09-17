@@ -2,7 +2,7 @@
   "endpoint": {
     "response": {
       "method": "POST",
-      "http-status": "201",
+      "status": "201",
       "content-type": "application/json",
       "body": {
         "message": "Created"

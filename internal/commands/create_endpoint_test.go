@@ -67,20 +67,20 @@ func TestProcessAuthCredentials(t *testing.T) {
 func TestLoadFromFlags(t *testing.T) {
 	cmd := &cobra.Command{}
 	cmd.Flags().String("method", "", "")
-	cmd.Flags().String("http-status", "", "")
+	cmd.Flags().String("status", "", "")
 	cmd.Flags().String("content-type", "", "")
 	cmd.Flags().String("charset", "", "")
 	cmd.Flags().String("body", "", "")
 
 	cmd.Flags().Set("method", "GET")
-	cmd.Flags().Set("http-status", "200")
+	cmd.Flags().Set("status", "200")
 	cmd.Flags().Set("content-type", "application/json")
 	cmd.Flags().Set("charset", "UTF-8")
 	cmd.Flags().Set("body", "Hello, World!")
 
 	expected := map[string]interface{}{
 		"method":              "GET",
-		"httpStatus":          "200",
+		"status":              "200",
 		"responseContentType": "application/json",
 		"charset":             "UTF-8",
 		"responseBody":        "Hello, World!",
@@ -103,14 +103,14 @@ func TestParseCommandArguments(t *testing.T) {
 			name: "Valid flags",
 			flags: map[string]string{
 				"method":       "GET",
-				"http-status":  "200",
+				"status":       "200",
 				"content-type": "application/json",
 				"charset":      "UTF-8",
 				"body":         "Hello, World!",
 			},
 			expected: map[string]interface{}{
 				"method":              "GET",
-				"httpStatus":          200,
+				"status":              200,
 				"responseContentType": "application/json",
 				"charset":             "UTF-8",
 				"responseBody":        "Hello, World!",
@@ -226,7 +226,7 @@ func TestLoadFromFile(t *testing.T) {
 			wantErr:  false,
 			expected: map[string]string{
 				"method":       "POST",
-				"http-status":  "201",
+				"status":       "201",
 				"content-type": "application/json",
 				"body":         `{"message":"Created"}`,
 			},
@@ -237,7 +237,7 @@ func TestLoadFromFile(t *testing.T) {
 			wantErr:  false,
 			expected: map[string]string{
 				"method":       "GET",
-				"http-status":  "200",
+				"status":       "200",
 				"content-type": "text/plain",
 				"body":         "Hello, World!",
 			},

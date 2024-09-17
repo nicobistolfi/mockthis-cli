@@ -20,7 +20,7 @@ import (
 
 // CreateEndpointCmd is the command to create a new mock endpoint
 var CreateEndpointCmd = &cobra.Command{
-	Use:   "create [--file <path>] [--auth-type <type>] [--auth-properties <properties>] [--request-content-type <type>] [--request-schema <schema>] [--method <method>] [--http-status <status>] [--content-type <type>] [--charset <charset>] [--headers <headers>] [--schema <schema>] [--body <body>]",
+	Use:   "create [--file <path>] [--auth-type <type>] [--auth-properties <properties>] [--request-content-type <type>] [--request-schema <schema>] [--method <method>] [--status <status>] [--content-type <type>] [--charset <charset>] [--headers <headers>] [--schema <schema>] [--body <body>]",
 	Short: "Create a new mock endpoint",
 	Run:   createEndpoint,
 }
@@ -30,13 +30,13 @@ func init() {
 	CreateEndpointCmd.Flags().StringP("file", "f", "", "Path to JSON or YAML file containing endpoint data")
 
 	// Response
-	CreateEndpointCmd.Flags().String("method", "GET", "HTTP method (GET, POST, PUT, DELETE, etc.)")
-	CreateEndpointCmd.Flags().String("http-status", "200", "HTTP status code")
-	CreateEndpointCmd.Flags().String("content-type", "application/json", "Response Content-Type")
-	CreateEndpointCmd.Flags().String("charset", "UTF-8", "Charset")
-	CreateEndpointCmd.Flags().String("headers", "", "Response headers (comma-separated key=value pairs)")
+	CreateEndpointCmd.Flags().StringP("method", "m", "GET", "HTTP method (GET, POST, PUT, DELETE, etc.)")
+	CreateEndpointCmd.Flags().StringP("status", "s", "200", "HTTP status code")
+	CreateEndpointCmd.Flags().StringP("content-type", "c", "application/json", "Response Content-Type")
+	CreateEndpointCmd.Flags().String("charset", "", "Charset")
+	CreateEndpointCmd.Flags().StringP("headers", "H", "", "Response headers (comma-separated key=value pairs)")
 	CreateEndpointCmd.Flags().String("schema", "", "JSON Schema to validate the response body")
-	CreateEndpointCmd.Flags().String("body", "Hello, World! 🌎", "Response body")
+	CreateEndpointCmd.Flags().StringP("body", "b", "Hello, World! 🌎", "Response body")
 
 	// Authentication
 	CreateEndpointCmd.Flags().String("auth-type", "", "Authentication type (basic, apiKey, bearer, oauth2, jwt)")
@@ -75,9 +75,9 @@ func parseCommandArguments(cmd *cobra.Command) (map[string]interface{}, error) {
 	}
 	endpointData = loadFromFlags(cmd)
 
-	// Convert httpStatus to int
-	if httpStatus, ok := endpointData["httpStatus"].(string); ok {
-		endpointData["httpStatus"], _ = strconv.Atoi(httpStatus)
+	// Convert status to int
+	if status, ok := endpointData["status"].(string); ok {
+		endpointData["status"], _ = strconv.Atoi(status)
 	}
 
 	authType, _ := cmd.Flags().GetString("auth-type")

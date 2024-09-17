@@ -27,13 +27,13 @@ func updateEndpoint(cmd *cobra.Command, args []string) {
 	token := configData.Token
 
 	id := args[0]
-	httpStatus := promptForInput("Enter new HTTP status code: ")
+	status := promptForInput("Enter new HTTP status code: ")
 	responseContentType := promptForInput("Enter new response Content-Type: ")
 	charset := promptForInput("Enter new charset: ")
 	responseBody := promptForInput("Enter new response body: ")
 
 	endpointData := map[string]interface{}{
-		"httpStatus":          httpStatus,
+		"status":              status,
 		"responseContentType": responseContentType,
 		"charset":             charset,
 		"responseBody":        responseBody,

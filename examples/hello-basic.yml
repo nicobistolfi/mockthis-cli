@@ -7,7 +7,7 @@ endpoint:
       password: admin
   response:
     method: GET
-    http-status: 200
+    status: 200
     content-type: plain/text
     charset: UTF-8
     headers:

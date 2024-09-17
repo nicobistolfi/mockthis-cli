@@ -8,7 +8,7 @@ endpoint:
       in: header
   response:
     method: GET
-    http-status: 200
+    status: 200
     content-type: application/json
     charset: UTF-8
     headers:
