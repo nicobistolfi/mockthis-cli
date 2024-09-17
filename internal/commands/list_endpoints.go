@@ -52,7 +52,7 @@ func listEndpoints(cmd *cobra.Command, args []string) {
 
 	var endpoints []struct {
 		ID             string    `json:"id"`
-		HTTPStatus     int       `json:"httpStatus"`
+		HTTPStatus     int       `json:"status"`
 		CreatedAt      time.Time `json:"createdAt"`
 		MockIdentifier string    `json:"mockIdentifier"`
 		EndpointURL    string    `json:"endpointUrl"`

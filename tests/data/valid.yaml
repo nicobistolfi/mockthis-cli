@@ -1,6 +1,6 @@
 endpoint:
   response:
     method: GET
-    http-status: "200"
+    status: "200"
     content-type: text/plain
     body: "Hello, World!"

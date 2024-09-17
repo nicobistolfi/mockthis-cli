@@ -17,7 +17,7 @@ endpoint:
       password: admin
   response:
     method: GET
-    http-status: 200
+    status: 200
     content-type: application/json
     charset: UTF-8
     headers:
@@ -43,7 +43,7 @@ endpoint:
 
 	// Response
 	cmd.Flags().String("method", "GET", "HTTP method (GET, POST, PUT, DELETE, etc.)")
-	cmd.Flags().String("http-status", "200", "HTTP status code")
+	cmd.Flags().String("status", "200", "HTTP status code")
 	cmd.Flags().String("content-type", "application/json", "Response Content-Type")
 	cmd.Flags().String("charset", "UTF-8", "Charset")
 	cmd.Flags().String("headers", "", "Response headers (comma-separated key=value pairs)")
@@ -67,7 +67,7 @@ endpoint:
 		{"auth-type", "basic"},
 		{"auth-properties", "{\"password\":\"admin\",\"username\":\"admin\"}"},
 		{"method", "GET"},
-		{"http-status", "200"},
+		{"status", "200"},
 		{"content-type", "application/json"},
 		{"charset", "UTF-8"},
 		{"headers", "{\"Content-Type\":\"application/json\",\"X-Random-Header\":\"MockThis Random Header\"}"},
