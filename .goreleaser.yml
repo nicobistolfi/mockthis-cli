@@ -1,6 +1,7 @@
 version: 2
 builds:
   - main: ./cmd/mockthis/
+    binary: mockthis
   #   binary: mockthis
   #   id: mockthis
   #   goos:
