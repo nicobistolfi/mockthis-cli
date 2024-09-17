@@ -10,10 +10,17 @@ import (
 
 // ConfigDir is the directory where the config file is stored
 var (
-	BaseURL   = "https://dev.api.mockthis.io/api/v1"
+	BaseURL   = getBaseURL()
 	TokenFile = ".credentials"
 	ConfigDir = ".mockthis"
 )
+
+func getBaseURL() string {
+	if url := os.Getenv("MOCKTHIS_API"); url != "" {
+		return url
+	}
+	return "https://api.mockthis.io/api/v1"
+}
 
 // Data is the structure of the config file
 type Data struct {
