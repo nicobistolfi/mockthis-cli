@@ -1,6 +1,25 @@
 version: 2
 builds:
   - main: ./cmd/mockthis/
+    binary: mockthis
+    id: mockthis
+    goos:
+      - windows
+      - linux
+    goarch:
+      - amd64
+      - arm64
+
+  - main: ./cmd/mockthis/
+    binary: mockthis
+    id: mockthis-macos
+    goos:
+      - darwin
+    goarch:
+      - amd64
+      - arm64
+    hooks:
+      post: gon gon.hcl
 
 brews:
   - name: mockthis
