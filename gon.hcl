@@ -2,7 +2,7 @@
 #
 # The path follows a pattern
 # ./dist/BUILD-ID_TARGET/BINARY-NAME
-source = ["./dist/mockthis-macos_darwin_amd64/mockthis", "./dist/mockthis-macos_darwin_arm64/mockthis"]
+source = ["./dist/mockthis-macos_darwin_amd64_v1/mockthis", "./dist/mockthis-macos_darwin_arm64/mockthis"]
 bundle_id = "com.nicobistolfi.mockthis.cli"
 
 apple_id {
