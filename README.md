@@ -95,7 +95,7 @@ Mock URL: https://api.mockthis.io/m/c35f0f6-af9d-4976-8ff9-d45e1dee8832
 +---------------------+--------------------------------------+
 | ID                  | c35f0f6-af9d-4976-8ff9-d45e1dee8832  |
 | Method              | GET                                  |
-| HTTPStatus          | 200                                  |
+| Status          | 200                                  |
 | ResponseContentType | application/json                     |
 | ResponseBody        | {"message": "Hello, World!"}         |
 | CreatedAt           | 2024-09-17T02:29:45Z                 |
