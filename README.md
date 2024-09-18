@@ -9,7 +9,15 @@
 ![Build And Test](https://github.com/nicobistolfi/mockthis-cli/actions/workflows/go.yml/badge.svg)
 ![Release](https://github.com/nicobistolfi/mockthis-cli/actions/workflows/release.yml/badge.svg)
 
-MockThis is a command-line interface (CLI) tool for managing mock API endpoints. It allows users to create, update, delete, and list mock endpoints for testing and development purposes.
+MockThis is a command-line interface (CLI) tool for managing publicly available mock API endpoints. It allows users to create, update, delete, and list mock endpoints for testing and development purposes.
+
+## Key Features
+
+- User authentication (login and registration)
+- Create new mock endpoints
+- Delete endpoints
+- List all created endpoints
+- Get details of specific endpoints
 
 ## Installation
 
@@ -26,15 +34,6 @@ To install MockThis on macOS using Homebrew, follow these steps:
    ```
    brew install mockthis
    ```
-
-## Key Features
-
-- User authentication (login and registration)
-- Create new mock endpoints
-- Update existing endpoints
-- Delete endpoints
-- List all created endpoints
-- Get details of specific endpoints
 
 ## Usage
 
@@ -60,7 +59,7 @@ For detailed information on each command, use:
 mockthis [command] --help
 ```
 
-## Registering a new user
+### Registering a new user
 
 To register a new user account, use the register command. You can provide your email as an argument or enter it when prompted.
 
@@ -68,7 +67,7 @@ To register a new user account, use the register command. You can provide your e
 mockthis register
 ```
 
-## Logging in
+### Logging in
 
 To log in to MockThis, use the login command. You can either provide your email as an argument or enter it when prompted.
 
@@ -78,7 +77,7 @@ mockthis login {email}
 If you don't provide an email, you will be prompted to enter it.
 
 
-## Creating a new endpoint
+### Creating a new endpoint
 
 To create a new mock endpoint, use the create command. You can provide the endpoint details as arguments or enter them when prompted.
 
@@ -102,3 +101,12 @@ Mock URL: https://api.mockthis.io/m/c35f0f6-af9d-4976-8ff9-d45e1dee8832
 | Charset             | UTF-8                                |
 ```
 
+## Roadmap
+The roadmap may change witouth notice.
+
+- Include JSON schema and validate schema for endpoint creation using `—file`
+- Enable `mockthis update` to update already existing endpoints
+- Update `mockthis get` to use the get endpoint instead of list
+- Allow the use of `—schema` to ensure the response body matches the schema
+- Allow the use of `—request-schema` to ensure the request body matches the schema
+- Implement header `X-Mock-Dynamic: true` in the request and use the schema to generate a dynamic response
