@@ -180,7 +180,7 @@ func processAPIResponse(resp *http.Response) (string, error) {
 // Print a table from a map and keep it aligned to the left
 func buildTableFromMap(data map[string]interface{}) string {
 	// Define the order of keys
-	order := []string{"ID", "Method", "HTTPStatus", "ResponseContentType", "ResponseBody"}
+	order := []string{"ID", "Method", "Status", "ResponseContentType", "ResponseBody"}
 
 	// Find the maximum width for each column
 	maxKeyWidth := 5   // minimum width for "Field"
