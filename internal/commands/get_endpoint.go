@@ -92,7 +92,7 @@ func getEndpointCmd(cmd *cobra.Command, args []string) {
 func printEndpointDetails(endpoint map[string]interface{}) {
 	fmt.Println("Endpoint Details:")
 	fmt.Printf("ID: %s\n", endpoint["id"])
-	fmt.Printf("Mock Identifier: %s\n", endpoint["mockIdentifier"])
+	// fmt.Printf("Mock Identifier: %s\n", endpoint["mockIdentifier"])
 	fmt.Printf("HTTP Status: %d\n", int(endpoint["status"].(float64)))
 	fmt.Printf("Created At: %s\n", endpoint["createdAt"])
 	fmt.Printf("Endpoint URL: %s\n", endpoint["endpointUrl"])
@@ -120,7 +120,7 @@ func printEndpointTable(endpoint map[string]interface{}) {
 	fmt.Println("| Key | Value |")
 	fmt.Println("|-----|-------|")
 	fmt.Printf("| ID | %s |\n", endpoint["id"])
-	fmt.Printf("| Mock Identifier | %s |\n", endpoint["mockIdentifier"])
+	// fmt.Printf("| Mock Identifier | %s |\n", endpoint["mockIdentifier"])
 	fmt.Printf("| HTTP Status | %d |\n", int(endpoint["status"].(float64)))
 	fmt.Printf("| Created At | %s |\n", endpoint["createdAt"])
 	fmt.Printf("| Endpoint URL | %s |\n", endpoint["endpointUrl"])

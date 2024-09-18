@@ -52,7 +52,7 @@ func listEndpoints(cmd *cobra.Command, args []string) {
 
 	var endpoints []struct {
 		ID             string    `json:"id"`
-		Status         int       `json:"status"`
+		HTTPStatus     int       `json:"status"`
 		CreatedAt      time.Time `json:"createdAt"`
 		MockIdentifier string    `json:"mockIdentifier"`
 		EndpointURL    string    `json:"endpointUrl"`
@@ -65,16 +65,15 @@ func listEndpoints(cmd *cobra.Command, args []string) {
 	}
 
 	w := tabwriter.NewWriter(os.Stdout, 0, 0, 2, ' ', 0)
-	fmt.Fprintln(w, "Mock Identifier\tID\tMethod\tStatus\tCreated At\tEndpoint URL")
-	fmt.Fprintln(w, "----------------\t--\t------\t------\t----------\t------------")
+	fmt.Fprintln(w, "ID\tMethod\tStatus\tCreated At\tEndpoint URL")
+	fmt.Fprintln(w, "--\t------\t------\t----------\t------------")
 
 	for _, e := range endpoints {
 		method := "GET" // Default method
-		fmt.Fprintf(w, "%s\t%s\t%s\t%d\t%s\t%s\n",
-			e.MockIdentifier,
+		fmt.Fprintf(w, "%s\t%s\t%d\t%s\t%s\n",
 			e.ID,
 			method,
-			e.Status,
+			e.HTTPStatus,
 			e.CreatedAt.Format("2006-01-02 15:04:05"),
 			e.EndpointURL)
 	}
