@@ -333,6 +333,7 @@ func loadFromFlags(cmd *cobra.Command) map[string]interface{} {
 		"request-content-type": "requestContentType",
 		"schema":               "responseBodySchema",
 		"request-schema":       "requestBodySchema",
+		"headers":              "httpHeaders",
 	}
 
 	cmd.Flags().VisitAll(func(flag *pflag.Flag) {
