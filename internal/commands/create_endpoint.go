@@ -75,9 +75,15 @@ func parseCommandArguments(cmd *cobra.Command) (map[string]interface{}, error) {
 	}
 	endpointData = loadFromFlags(cmd)
 
-	// Convert status to int
+	// Convert status to int or set to 200 if not present or conversion fails
 	if status, ok := endpointData["status"].(string); ok {
-		endpointData["status"], _ = strconv.Atoi(status)
+		if convertedStatus, err := strconv.Atoi(status); err == nil {
+			endpointData["status"] = convertedStatus
+		} else {
+			endpointData["status"] = 200
+		}
+	} else {
+		endpointData["status"] = 200
 	}
 
 	authType, _ := cmd.Flags().GetString("auth-type")
