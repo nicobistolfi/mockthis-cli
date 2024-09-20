@@ -154,7 +154,6 @@ func queryAPIEndpoint(endpointData map[string]interface{}) *http.Response {
 		fmt.Println("Error marshalling endpoint data:", err)
 		os.Exit(1)
 	}
-	fmt.Println("endpointData: ", string(jsonData))
 
 	req, _ := http.NewRequest("POST", config.BaseURL+"/endpoints", bytes.NewBuffer(jsonData))
 	req.Header.Set("Content-Type", "application/json")
