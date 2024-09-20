@@ -38,7 +38,7 @@ func init() {
 	CreateEndpointCmd.Flags().StringP("status", "s", "200", "HTTP status code")
 	CreateEndpointCmd.Flags().StringP("content-type", "c", "application/json", "Response Content-Type")
 	CreateEndpointCmd.Flags().String("charset", "", "Charset")
-	CreateEndpointCmd.Flags().StringP("headers", "H", "", "Response headers (comma-separated key=value pairs)")
+	CreateEndpointCmd.Flags().StringP("headers", "H", "", "Response headers, comma-separated key=value pairs or JSON. Eg. 'H1: v1, H2: v2'")
 	CreateEndpointCmd.Flags().String("schema", "", "JSON Schema to validate the response body")
 	CreateEndpointCmd.Flags().StringP("body", "b", "Hello, World! 🌎", "Response body")
 
@@ -149,7 +149,12 @@ func getConfig() *config.Data {
 func queryAPIEndpoint(endpointData map[string]interface{}) *http.Response {
 	configData := getConfig()
 
-	jsonData, _ := json.Marshal(endpointData)
+	jsonData, err := json.Marshal(endpointData)
+	if err != nil {
+		fmt.Println("Error marshalling endpoint data:", err)
+		os.Exit(1)
+	}
+	fmt.Println("endpointData: ", string(jsonData))
 
 	req, _ := http.NewRequest("POST", config.BaseURL+"/endpoints", bytes.NewBuffer(jsonData))
 	req.Header.Set("Content-Type", "application/json")

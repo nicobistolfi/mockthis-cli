@@ -20,7 +20,23 @@
       "additionalProperties": false,
       "properties": {
         "auth": {
-          "$ref": "#/definitions/Auth"
+          "oneOf": [
+            {
+              "$ref": "#/definitions/BasicAuth"
+            },
+            {
+              "$ref": "#/definitions/APIKey"
+            },
+            {
+              "$ref": "#/definitions/BearerToken"
+            },
+            {
+              "$ref": "#/definitions/OAuth2"
+            },
+            {
+              "$ref": "#/definitions/JWT"
+            }
+          ]
         },
         "response": {
           "$ref": "#/definitions/Response"
@@ -34,30 +50,6 @@
       ],
       "title": "Endpoint"
     },
-    "Auth": {
-      "type": "object",
-      "oneOf": [
-        {
-          "$ref": "#/definitions/BasicAuth"
-        },
-        {
-          "$ref": "#/definitions/APIKey"
-        },
-        {
-          "$ref": "#/definitions/BearerToken"
-        },
-        {
-          "$ref": "#/definitions/OAuth2"
-        },
-        {
-          "$ref": "#/definitions/JWT"
-        }
-      ],
-      "title": "Auth",
-      "required": [
-        "type"
-      ]
-    },
     "BasicAuth": {
       "type": "object",
       "properties": {
@@ -67,17 +59,25 @@
             "basic"
           ]
         },
-        "username": {
-          "type": "string"
-        },
-        "password": {
-          "type": "string"
+        "properties": {
+          "type": "object",
+          "properties": {
+            "username": {
+              "type": "string"
+            },
+            "password": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "username",
+            "password"
+          ]
         }
       },
       "required": [
         "type",
-        "username",
-        "password"
+        "properties"
       ]
     },
     "APIKey": {
@@ -240,15 +240,6 @@
     },
     "Headers": {
       "type": "object",
-      "additionalProperties": false,
-      "properties": {
-        "X-Example-Header": {
-          "type": "string"
-        }
-      },
-      "required": [
-        "X-Example-Header"
-      ],
       "title": "Headers"
     },
     "HTTPStatus": {
