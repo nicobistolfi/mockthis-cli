@@ -1,0 +1,148 @@
+{
+  "$schema": "http://json-schema.org/draft-06/schema#",
+  "$ref": "#/definitions/File",
+  "definitions": {
+    "File": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "endpoint": {
+          "$ref": "#/definitions/Endpoint"
+        }
+      },
+      "required": [
+        "endpoint"
+      ],
+      "title": "File"
+    },
+    "Endpoint": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "auth": {
+          "$ref": "#/definitions/Auth"
+        },
+        "response": {
+          "$ref": "#/definitions/Response"
+        },
+        "request": {
+          "$ref": "#/definitions/Request"
+        }
+      },
+      "required": [
+        "response"
+      ],
+      "title": "Endpoint"
+    },
+    "Auth": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "type": "string"
+        },
+        "properties": {
+          "$ref": "#/definitions/Properties"
+        }
+      },
+      "required": [
+        "properties",
+        "type"
+      ],
+      "title": "Auth"
+    },
+    "Properties": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "token": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "token"
+      ],
+      "title": "Properties"
+    },
+    "Request": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "content-type": {
+          "type": "string"
+        },
+        "schema": {
+          "$ref": "#/definitions/Schema"
+        }
+      },
+      "required": [
+        "content-type",
+        "schema"
+      ],
+      "title": "Request"
+    },
+    "Schema": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "type"
+      ],
+      "title": "Schema"
+    },
+    "Response": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "method": {
+          "type": "string"
+        },
+        "status": {
+          "type": "integer"
+        },
+        "content-type": {
+          "type": "string"
+        },
+        "charset": {
+          "type": "string"
+        },
+        "headers": {
+          "$ref": "#/definitions/Headers"
+        },
+        "schema": {
+          "$ref": "#/definitions/Schema"
+        },
+        "body": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "body",
+        "charset",
+        "content-type",
+        "headers",
+        "method",
+        "schema",
+        "status"
+      ],
+      "title": "Response"
+    },
+    "Headers": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "X-Example-Header": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "X-Example-Header"
+      ],
+      "title": "Headers"
+    }
+  }
+}

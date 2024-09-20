@@ -2,6 +2,7 @@ package commands
 
 import (
 	"bytes"
+	_ "embed"
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -24,6 +25,9 @@ var CreateEndpointCmd = &cobra.Command{
 	Short: "Create a new mock endpoint",
 	Run:   createEndpoint,
 }
+
+//go:embed schemas/endpoint.json
+var ENDPOINT_SCHEMA string
 
 func init() {
 	// File
@@ -316,6 +320,13 @@ func loadFromFile(filePath string, cmd *cobra.Command) error {
 
 	if err != nil {
 		fmt.Printf("Error parsing file: %v\n", err)
+		return err
+	}
+
+	// Validate the parsed data against the schema
+	err = utils.ValidateAgainstSchema(endpointData, ENDPOINT_SCHEMA)
+	if err != nil {
+		fmt.Printf("Error validating endpoint data: %v\n", err)
 		return err
 	}
 
