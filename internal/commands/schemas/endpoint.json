@@ -36,33 +36,145 @@
     },
     "Auth": {
       "type": "object",
-      "additionalProperties": false,
+      "oneOf": [
+        {
+          "$ref": "#/definitions/BasicAuth"
+        },
+        {
+          "$ref": "#/definitions/APIKey"
+        },
+        {
+          "$ref": "#/definitions/BearerToken"
+        },
+        {
+          "$ref": "#/definitions/OAuth2"
+        },
+        {
+          "$ref": "#/definitions/JWT"
+        }
+      ],
+      "title": "Auth",
+      "required": [
+        "type"
+      ]
+    },
+    "BasicAuth": {
+      "type": "object",
       "properties": {
         "type": {
+          "type": "string",
+          "enum": [
+            "basic"
+          ]
+        },
+        "username": {
           "type": "string"
         },
-        "properties": {
-          "$ref": "#/definitions/Properties"
+        "password": {
+          "type": "string"
         }
       },
       "required": [
-        "properties",
-        "type"
-      ],
-      "title": "Auth"
+        "type",
+        "username",
+        "password"
+      ]
     },
-    "Properties": {
+    "APIKey": {
       "type": "object",
-      "additionalProperties": false,
       "properties": {
+        "type": {
+          "type": "string",
+          "enum": [
+            "apiKey"
+          ]
+        },
+        "name": {
+          "type": "string"
+        },
+        "value": {
+          "type": "string"
+        },
+        "in": {
+          "type": "string",
+          "enum": [
+            "header",
+            "query"
+          ]
+        }
+      },
+      "required": [
+        "type",
+        "name",
+        "value",
+        "in"
+      ]
+    },
+    "BearerToken": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": [
+            "bearer"
+          ]
+        },
         "token": {
           "type": "string"
         }
       },
       "required": [
+        "type",
         "token"
-      ],
-      "title": "Properties"
+      ]
+    },
+    "OAuth2": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": [
+            "oauth2"
+          ]
+        },
+        "accessToken": {
+          "type": "string"
+        },
+        "tokenType": {
+          "type": "string"
+        },
+        "expiresIn": {
+          "type": "integer"
+        },
+        "refreshToken": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "type",
+        "accessToken",
+        "tokenType",
+        "expiresIn",
+        "refreshToken"
+      ]
+    },
+    "JWT": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": [
+            "jwt"
+          ]
+        },
+        "token": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "type",
+        "token"
+      ]
     },
     "Request": {
       "type": "object",
@@ -75,10 +187,6 @@
           "$ref": "#/definitions/Schema"
         }
       },
-      "required": [
-        "content-type",
-        "schema"
-      ],
       "title": "Request"
     },
     "Schema": {
@@ -102,7 +210,7 @@
           "type": "string"
         },
         "status": {
-          "type": "integer"
+          "$ref": "#/definitions/HTTPStatus"
         },
         "content-type": {
           "type": "string"
@@ -117,18 +225,17 @@
           "$ref": "#/definitions/Schema"
         },
         "body": {
-          "type": "string"
+          "oneOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "object"
+            }
+          ]
         }
       },
-      "required": [
-        "body",
-        "charset",
-        "content-type",
-        "headers",
-        "method",
-        "schema",
-        "status"
-      ],
+      "required": [],
       "title": "Response"
     },
     "Headers": {
@@ -143,6 +250,74 @@
         "X-Example-Header"
       ],
       "title": "Headers"
+    },
+    "HTTPStatus": {
+      "type": "string",
+      "enum": [
+        "100",
+        "101",
+        "102",
+        "103",
+        "200",
+        "201",
+        "202",
+        "203",
+        "204",
+        "205",
+        "206",
+        "207",
+        "208",
+        "226",
+        "300",
+        "301",
+        "302",
+        "303",
+        "304",
+        "305",
+        "306",
+        "307",
+        "308",
+        "400",
+        "401",
+        "402",
+        "403",
+        "404",
+        "405",
+        "406",
+        "407",
+        "408",
+        "409",
+        "410",
+        "411",
+        "412",
+        "413",
+        "414",
+        "415",
+        "416",
+        "417",
+        "418",
+        "421",
+        "422",
+        "423",
+        "424",
+        "425",
+        "426",
+        "428",
+        "429",
+        "431",
+        "451",
+        "500",
+        "501",
+        "502",
+        "503",
+        "504",
+        "505",
+        "506",
+        "507",
+        "508",
+        "510",
+        "511"
+      ]
     }
   }
 }
