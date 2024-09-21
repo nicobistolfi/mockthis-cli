@@ -29,6 +29,7 @@ func MapToFlags(data map[string]interface{}, cmd *cobra.Command) {
 			os.Exit(1)
 		}
 	}
+
 }
 
 func handleNestedMap(prefix string, data map[string]interface{}, cmd *cobra.Command) {

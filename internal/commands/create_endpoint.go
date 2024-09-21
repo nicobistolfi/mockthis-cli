@@ -2,6 +2,7 @@ package commands
 
 import (
 	"bytes"
+	_ "embed"
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -25,6 +26,9 @@ var CreateEndpointCmd = &cobra.Command{
 	Run:   createEndpoint,
 }
 
+//go:embed schemas/endpoint.json
+var ENDPOINT_SCHEMA string
+
 func init() {
 	// File
 	CreateEndpointCmd.Flags().StringP("file", "f", "", "Path to JSON or YAML file containing endpoint data")
@@ -34,7 +38,7 @@ func init() {
 	CreateEndpointCmd.Flags().StringP("status", "s", "200", "HTTP status code")
 	CreateEndpointCmd.Flags().StringP("content-type", "c", "application/json", "Response Content-Type")
 	CreateEndpointCmd.Flags().String("charset", "", "Charset")
-	CreateEndpointCmd.Flags().StringP("headers", "H", "", "Response headers (comma-separated key=value pairs)")
+	CreateEndpointCmd.Flags().StringP("headers", "H", "", "Response headers, comma-separated key=value pairs or JSON. Eg. 'H1: v1, H2: v2'")
 	CreateEndpointCmd.Flags().String("schema", "", "JSON Schema to validate the response body")
 	CreateEndpointCmd.Flags().StringP("body", "b", "Hello, World! 🌎", "Response body")
 
@@ -145,7 +149,11 @@ func getConfig() *config.Data {
 func queryAPIEndpoint(endpointData map[string]interface{}) *http.Response {
 	configData := getConfig()
 
-	jsonData, _ := json.Marshal(endpointData)
+	jsonData, err := json.Marshal(endpointData)
+	if err != nil {
+		fmt.Println("Error marshalling endpoint data:", err)
+		os.Exit(1)
+	}
 
 	req, _ := http.NewRequest("POST", config.BaseURL+"/endpoints", bytes.NewBuffer(jsonData))
 	req.Header.Set("Content-Type", "application/json")
@@ -316,6 +324,13 @@ func loadFromFile(filePath string, cmd *cobra.Command) error {
 
 	if err != nil {
 		fmt.Printf("Error parsing file: %v\n", err)
+		return err
+	}
+
+	// Validate the parsed data against the schema
+	err = utils.ValidateAgainstSchema(endpointData, ENDPOINT_SCHEMA)
+	if err != nil {
+		fmt.Printf("Error validating endpoint data: %v\n", err)
 		return err
 	}
 

@@ -2,7 +2,7 @@
 endpoint:
   response:
     method: POST
-    status: 201
+    status: "201"
     content-type: application/json
     charset: UTF-8
     headers:
