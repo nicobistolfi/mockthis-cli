@@ -2,7 +2,7 @@ version: 2
 builds:
   - main: ./cmd/mockthis/
     binary: mockthis
-    ldflags: -X 'main.version={{.Version}} -X 'main.commit={{.Commit}}' -X 'main.date={{.Date}}''
+    ldflags: -s -w -X "main.version={{.Version}}" -X "main.commit={{.Commit}}" -X "main.date={{.Date}}"
 snapshot:
   name_template: "{{ .Tag }}-next"
 brews:
