@@ -1,5 +1,6 @@
 # MockThis CLI
 
+![Version](https://img.shields.io/github/v/release/nicobistolfi/mockthis-cli.svg)
 [![Go Reference](https://pkg.go.dev/badge/github.com/nicobistolfi/mockthis-cli.svg)](https://pkg.go.dev/github.com/nicobistolfi/mockthis-cli)
 [![Go Report Card](https://goreportcard.com/badge/github.com/nicobistolfi/mockthis-cli?v=1)](https://goreportcard.com/report/github.com/nicobistolfi/mockthis-cli)
 [![Documentation](https://img.shields.io/badge/documentation-yes-blue.svg)](https://docs.mockthis.io/)
